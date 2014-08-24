@@ -17,6 +17,11 @@ public class GreetingController {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @RequestMapping("/")
+    public String index() {
+        return "redirect:/greeting";
+    }
+
     @RequestMapping("/greeting")
     public String greeting(
             @RequestParam(value = "name", required = false, defaultValue = "World") String name,
