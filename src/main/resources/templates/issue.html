@@ -3,12 +3,12 @@
   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
   layout:decorator="layout">
 <head>
-<title>Greeting</title>
+<title>Issue</title>
 </head>
 <body>
 <div layout:fragment="content">
 <p th:text="'Hello, ' + ${name} + '!'" />
-<p>北京时间：<span th:text="${now}"></span></p>
+<p>issue count: <span th:text="${count}"></span></p>
 </div>
 </body>
 </html>
