@@ -2,19 +2,21 @@ package com.anjuke.dw.tools.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
 public class Issue {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue
     private Long id;
     private String title;
     private String content;
     private Long ownerId;
+    @Column(updatable = false)
     private Date created;
+    @Column(insertable = false, updatable = false)
     private Date updated;
     public Long getId() {
         return id;
