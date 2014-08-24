@@ -9,11 +9,19 @@ import javax.persistence.Id;
 
 @Entity
 public class Issue {
+
+    public static final int STATUS_OPENED = 1;
+    public static final int STATUS_CLOSED = 2;
+
     @Id @GeneratedValue
     private Long id;
     private String title;
     private String content;
-    private Long ownerId;
+    private Integer status;
+    private Long creatorId;
+    private Long asigneeId;
+    private Long replierId;
+    private Date replied;
     @Column(updatable = false)
     private Date created;
     @Column(insertable = false, updatable = false)
@@ -36,11 +44,35 @@ public class Issue {
     public void setContent(String content) {
         this.content = content;
     }
-    public Long getOwnerId() {
-        return ownerId;
+    public Integer getStatus() {
+        return status;
     }
-    public void setOwnerId(Long ownerId) {
-        this.ownerId = ownerId;
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+    public Long getCreatorId() {
+        return creatorId;
+    }
+    public void setCreatorId(Long creatorId) {
+        this.creatorId = creatorId;
+    }
+    public Long getAsigneeId() {
+        return asigneeId;
+    }
+    public void setAsigneeId(Long asigneeId) {
+        this.asigneeId = asigneeId;
+    }
+    public Long getReplierId() {
+        return replierId;
+    }
+    public void setReplierId(Long replierId) {
+        this.replierId = replierId;
+    }
+    public Date getReplied() {
+        return replied;
+    }
+    public void setReplied(Date replied) {
+        this.replied = replied;
     }
     public Date getCreated() {
         return created;

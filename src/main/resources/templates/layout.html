@@ -5,6 +5,7 @@
 <meta http-equiv="content-type" content="text/html;charset=utf-8" />
 <title layout:title-pattern="$DECORATOR_TITLE - $CONTENT_TITLE">DW Tools</title>
 <link th:href="@{/webjars/bootstrap/3.2.0/css/bootstrap.min.css}" rel="stylesheet" />
+<link th:href="@{/css/layout.css}" rel="stylesheet" />
 </head>
 <body>
 
@@ -21,8 +22,8 @@
     </div>
     <div class="collapse navbar-collapse bs-navbar-collapse">
       <ul class="nav navbar-nav">
-        <li th:class="${navbar} == 'ppp' ? 'active' : ''"><a href="#">PPP</a></li>
-        <li th:class="${navbar} == 'issue' ? 'active' : ''"><a th:href="@{/issue}">Issues</a></li>
+        <li th:class="${navbar} == 'ppp' ? active"><a href="#">PPP</a></li>
+        <li th:class="${navbar} == 'issue' ? active"><a th:href="@{/issue}">Issues</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a href="#">张三</a></li>
