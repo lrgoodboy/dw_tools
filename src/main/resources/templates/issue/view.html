@@ -1,0 +1,29 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorator="layout">
+<head>
+<title th:text="'Issue #' + ${issue.id} + ' - ' + ${issue.title}"></title>
+<link th:href="@{/css/issue/view.css}" rel="stylesheet" />
+</head>
+<body>
+<div layout:fragment="content">
+
+<div class="row">
+  <div class="col-md-12 subsite-title-row">
+    <a class="btn btn-default pull-right" th:href="@{/issue/list}"><span class="glyphicon glyphicon-share-alt"></span> 返回</a>
+    <a class="btn btn-default pull-right" th:href="@{/issue/add}"><span class="glyphicon glyphicon-plus"></span> 新建</a>
+    <a class="btn btn-default pull-right" th:href="@{/issue/edit/{id}(id=${issue.id})}"><span class="glyphicon glyphicon-edit"></span> 编辑</a>
+    <div class='subsite-title'>Issue #<span th:text="${issue.id}"></span></div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <span th:text="${issue.id}"></span>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

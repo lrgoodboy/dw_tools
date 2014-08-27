@@ -77,7 +77,14 @@
   <div class="col-md-10">
 
     <div class="issue-item" th:each="issue : ${issues}">
-      <div class="issue-title"><span class="text-muted" th:text="'#' + ${issue.id}"></span> <a href="#" th:text="${issue.title}"></a> <span class="label label-success"><span class="glyphicon glyphicon-tag"></span> 流程</span> <span class="label label-success"><span class="glyphicon glyphicon-tag"></span> 问题</span></div>
+      <div class="issue-title">
+        <span class="text-muted" th:text="'#' + ${issue.id}"></span>
+        <a th:href="@{/issue/view/{id}(id=${issue.id})}" th:text="${issue.title}"></a>
+        <!--
+        <span class="label label-success"><span class="glyphicon glyphicon-tag"></span> 流程</span>
+        <span class="label label-success"><span class="glyphicon glyphicon-tag"></span> 问题</span>
+        -->
+      </div>
       <div class="issue-info text-muted">
         <span class="glyphicon glyphicon-pencil"></span>
         <a href="#" th:text="${users[issue.creatorId].truename}"></a>创建于<span th:text="${#dates.format(issue.created, 'yyyy-MM-dd HH:mm:ss')}"></span>
