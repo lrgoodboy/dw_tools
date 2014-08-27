@@ -22,7 +22,7 @@
 
     <div class="filter-header">状态</div>
     <ul class="nav nav-pills nav-stacked filter-body">
-      <li class="active"><a href="#">未解决</a></li>
+      <li class="active"><a href="#"><span class="badge pull-right" th:text="${numOpened}"></span>未解决</a></li>
       <li><a href="#">已关闭</a></li>
       <li><a href="#">全部</a></li>
     </ul>
@@ -30,13 +30,13 @@
     <div class="filter-header">排序</div>
     <div class="btn-group btn-block filter-body">
       <button type="button" class="btn btn-block btn-default dropdown-toggle" data-toggle="dropdown">
-        按回复时间倒序 <span class="caret"></span>
+        按更新时间倒序 <span class="caret"></span>
       </button>
       <ul class="dropdown-menu btn-block">
         <li><a href="#">按创建时间顺序</a></li>
         <li><a href="#">按创建时间倒序</a></li>
-        <li><a href="#">按回复时间顺序</a></li>
-        <li><a href="#">按回复时间倒序</a></li>
+        <li><a href="#">按更新时间顺序</a></li>
+        <li><a href="#">按更新时间倒序</a></li>
       </ul>
     </div>
 
@@ -89,6 +89,10 @@
         <span class="glyphicon glyphicon-pencil"></span> <a href="#">张三三</a>创建于2014-08-09 11:22:33<span class="issue-info-separator"></span>
         <span class="glyphicon glyphicon-user"></span> 未指定处理人<span class="issue-info-separator"></span>
         <span class="glyphicon glyphicon-comment"></span> 没有回复</div>
+    </div>
+
+    <div th:each="issue : ${issues}">
+      <span th:text="${issue.id}"></span>
     </div>
 
   </div>

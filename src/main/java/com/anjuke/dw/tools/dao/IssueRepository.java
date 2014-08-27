@@ -4,6 +4,6 @@ import org.springframework.data.repository.CrudRepository;
 
 import com.anjuke.dw.tools.model.Issue;
 
-public interface IssueRepository extends CrudRepository<Issue, Long> {
-
+public interface IssueRepository extends CrudRepository<Issue, Long>, IssueRepositoryCustom {
+    int countByStatus(int status);
 }
