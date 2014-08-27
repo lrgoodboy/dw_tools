@@ -21,6 +21,7 @@ public class Issue {
     private Long creatorId;
     private Long asigneeId;
     private Long replierId;
+    private Integer replyCount;
     private Date replied;
     @Column(updatable = false)
     private Date created;
@@ -67,6 +68,12 @@ public class Issue {
     }
     public void setReplierId(Long replierId) {
         this.replierId = replierId;
+    }
+    public Integer getReplyCount() {
+        return replyCount;
+    }
+    public void setReplyCount(Integer replyCount) {
+        this.replyCount = replyCount;
     }
     public Date getReplied() {
         return replied;
