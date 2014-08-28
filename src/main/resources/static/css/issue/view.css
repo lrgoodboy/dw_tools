@@ -1,3 +1,46 @@
 .subsite-title-row .btn {
-    margin-left: 5px;
+  margin-left: 5px;
+}
+
+.issue-item {
+  border: 1px solid #eee;
+  border-radius: 5px;
+}
+
+.issue-header {
+  background-color: #f8f8f8;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.issue-title {
+  font-weight: bold;
+}
+
+.issue-content {
+  padding: 10px;
+}
+
+.issue-footer {
+  padding: 5px;
+  border-top: 1px solid #f8f8f8;
+  text-align: right;
+}
+
+.issue-avatar {
+  display: inline-block;
+  width: 60px;
+  height: 60px;
+}
+
+.action-row {
+  margin-top: 15px;
+}
+
+.action-item .btn {
+  visibility: hidden;
+}
+
+.action-item:hover .btn {
+  visibility: visible;
 }

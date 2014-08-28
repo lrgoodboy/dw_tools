@@ -1,5 +1,6 @@
 package com.anjuke.dw.tools.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,24 +10,30 @@ import java.util.Set;
 
 import javax.validation.Valid;
 
+import org.json.JSONObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.DigestUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.anjuke.dw.tools.dao.IssueActionRepository;
 import com.anjuke.dw.tools.dao.IssueRepository;
 import com.anjuke.dw.tools.dao.UserRepository;
 import com.anjuke.dw.tools.form.IssueFilterForm;
 import com.anjuke.dw.tools.form.IssueForm;
 import com.anjuke.dw.tools.model.Issue;
+import com.anjuke.dw.tools.model.IssueAction;
 import com.anjuke.dw.tools.model.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsonorg.JsonOrgModule;
 
 @Controller
 @RequestMapping("/issue")
@@ -36,6 +43,13 @@ public class IssueController {
     private IssueRepository issueRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private IssueActionRepository issueActionRepository;
+
+    private static ObjectMapper json = new ObjectMapper();
+    static {
+        json.registerModule(new JsonOrgModule());
+    }
 
     @RequestMapping({"", "list"})
     public String list(@ModelAttribute("issueFilter") IssueFilterForm issueFilter, Model model) {
@@ -92,7 +106,38 @@ public class IssueController {
 
     @RequestMapping("view/{id}")
     public String view(@PathVariable("id") Issue issue, Model model) {
+
+        Set<Long> userIds = new HashSet<Long>();
+        userIds.add(issue.getCreatorId());
+
+        List<IssueAction> actions = new ArrayList<IssueAction>();
+        Map<Long, JSONObject> details = new HashMap<Long, JSONObject>();
+        for (IssueAction action : issueActionRepository.findByIssueIdOrderByCreatedDesc(issue.getId())) {
+            actions.add(action);
+
+            JSONObject detail;
+            try {
+                detail = json.readValue(action.getDetails(), JSONObject.class);
+            } catch (Exception e) {
+                detail = new JSONObject();
+            }
+            details.put(action.getId(), detail);
+
+            userIds.add(action.getOperatorId());
+        }
+
+        Map<Long, User> users = new HashMap<Long, User>();
+        Map<Long, String> hashes = new HashMap<Long, String>();
+        for (User user : userRepository.findAll(userIds)) {
+            users.put(user.getId(), user);
+            hashes.put(user.getId(), DigestUtils.md5DigestAsHex(user.getEmail().trim().toLowerCase().getBytes()));
+        }
+
         model.addAttribute("issue", issue);
+        model.addAttribute("actions", actions);
+        model.addAttribute("details", details);
+        model.addAttribute("users", users);
+        model.addAttribute("hashes", hashes);
         return "issue/view";
     }
 

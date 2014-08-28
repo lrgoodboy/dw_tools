@@ -47,6 +47,11 @@
             <artifactId>bootstrap</artifactId>
             <version>3.2.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-json-org</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

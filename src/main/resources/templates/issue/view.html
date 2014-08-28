@@ -19,11 +19,52 @@
 </div>
 
 <div class="row">
-  <div class="col-md-12">
-    <span th:text="${issue.id}"></span>
+  <div class="col-md-1">
+    <a href="#" class="issue-avatar" data-toggle="tooltip" th:title="${users[issue.creatorId].truename}">
+      <img th:src="@{http://www.gravatar.com/avatar/{hash}?s=60(hash=${hashes[issue.creatorId]})}" class="img-rounded" />
+    </a>
+  </div>
+  <div class="col-md-11">
+    <div class="issue-item">
+      <div class="issue-header">
+        <span class="text-danger pull-right" th:if="${issue.status == 1}">未解决</span>
+        <span class="text-muted pull-right" th:if="${issue.status == 2}">已关闭</span>
+        <span th:text="${issue.title}" class="issue-title"></span>
+      </div>
+      <div th:text="${issue.content}" class="issue-content"></div>
+      <div class="issue-footer text-muted">
+        <a href="#" th:text="${users[issue.creatorId].truename}"></a>
+        <span th:text="${#dates.format(issue.created, 'yyyy-MM-dd HH:mm:ss')}"></span>
+      </div>
+    </div>
   </div>
 </div>
 
+<div class="row action-row" th:each="action : ${actions}">
+  <div class="col-md-1">
+    <a href="#" class="issue-avatar" data-toggle="tooltip" th:title="${users[action.operatorId].truename}">
+      <img th:src="@{http://www.gravatar.com/avatar/{hash}?s=60(hash=${hashes[action.operatorId]})}" class="img-rounded" />
+    </a>
+  </div>
+  <div class="col-md-11">
+    <div class="issue-item action-item">
+      <div th:if="${action.action == 4}" th:text="${details[action.id].get('reply')}" class="issue-content"></div>
+      <div class="issue-footer text-muted">
+        <a href="#" class="btn btn-link btn-xs pull-left"><span class="glyphicon glyphicon-edit"></span> 编辑</a>
+        <a href="#" class="btn btn-link btn-xs pull-left"><span class="glyphicon glyphicon-remove"></span> 删除</a>
+        <a href="#" th:text="${users[action.operatorId].truename}"></a>
+        <span th:text="${#dates.format(action.created, 'yyyy-MM-dd HH:mm:ss')}"></span>
+      </div>
+    </div>
+  </div>
 </div>
+
+</div><!-- content -->
+
+<script type="text/javascript" layout:fragment="script">
+$(function() {
+  $('.issue-avatar').tooltip({placement: 'bottom'});
+});
+</script>
 </body>
 </html>

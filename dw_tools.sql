@@ -10,7 +10,8 @@ CREATE TABLE `issue` (
   `replied` datetime NOT NULL,
   `created` datetime NOT NULL,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `status_updated` (`status`,`updated`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `user` (
@@ -22,4 +23,15 @@ CREATE TABLE `user` (
   `created` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `issue_action` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `issue_id` bigint(20) NOT NULL,
+  `operator_id` bigint(20) NOT NULL,
+  `action` int(11) NOT NULL,
+  `details` text NOT NULL,
+  `created` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `issue_created` (`issue_id`, `created`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
