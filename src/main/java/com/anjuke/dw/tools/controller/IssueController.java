@@ -18,17 +18,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.DigestUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.anjuke.dw.tools.dao.IssueActionRepository;
 import com.anjuke.dw.tools.dao.IssueRepository;
 import com.anjuke.dw.tools.dao.UserRepository;
 import com.anjuke.dw.tools.form.IssueFilterForm;
 import com.anjuke.dw.tools.form.IssueForm;
+import com.anjuke.dw.tools.form.IssueReplyForm;
 import com.anjuke.dw.tools.model.Issue;
 import com.anjuke.dw.tools.model.IssueAction;
 import com.anjuke.dw.tools.model.User;
@@ -37,6 +41,7 @@ import com.fasterxml.jackson.datatype.jsonorg.JsonOrgModule;
 
 @Controller
 @RequestMapping("/issue")
+@SessionAttributes("user")
 public class IssueController {
 
     @Autowired
@@ -52,10 +57,10 @@ public class IssueController {
     }
 
     @RequestMapping({"", "list"})
-    public String list(@ModelAttribute("issueFilter") IssueFilterForm issueFilter, Model model) {
+    public String list(@ModelAttribute IssueFilterForm issueFilterForm, Model model) {
 
-        Pageable pageable = new PageRequest(0, Integer.MAX_VALUE, issueFilter.parseSort());
-        List<Issue> issues = issueRepository.findByFilters(issueFilter.getStatus(), pageable);
+        Pageable pageable = new PageRequest(0, Integer.MAX_VALUE, issueFilterForm.parseSort());
+        List<Issue> issues = issueRepository.findByFilters(issueFilterForm.getStatus(), pageable);
 
         Set<Long> userIds = new HashSet<Long>();
         for (Issue issue : issues) {
@@ -76,13 +81,12 @@ public class IssueController {
     }
 
     @RequestMapping(value = "add", method = RequestMethod.GET)
-    public String add(Model model) {
-        model.addAttribute("issue", new IssueForm());
+    public String add(@ModelAttribute IssueForm issueForm, Model model) {
         return "edit";
     }
 
     @RequestMapping(value = "add", method = RequestMethod.POST)
-    public String addSubmit(@Valid @ModelAttribute("issue") IssueForm issueForm,
+    public String addSubmit(@Valid @ModelAttribute IssueForm issueForm,
             BindingResult result, Model model) {
 
         if (result.hasErrors()) {
@@ -101,18 +105,98 @@ public class IssueController {
         issue.setCreated(now);
         issueRepository.save(issue);
 
+        IssueAction action = new IssueAction();
+        action.setIssueId(issue.getId());
+        action.setOperatorId(1L);
+        action.setAction(IssueAction.ACTION_OPEN);
+        action.setDetails("{}");
+        action.setCreated(now);
+        issueActionRepository.save(action);
+
         return "redirect:list";
     }
 
-    @RequestMapping("view/{id}")
-    public String view(@PathVariable("id") Issue issue, Model model) {
+    @RequestMapping(value = "view/{id}", method = RequestMethod.GET)
+    public String view(@PathVariable("id") Issue issue,
+            @ModelAttribute IssueReplyForm issueReplyForm,
+            Model model) {
+
+        renderIssueView(issue, model);
+        return "issue/view";
+    }
+
+    @RequestMapping(value = "view/{id}", method = RequestMethod.POST)
+    public String viewSubmit(@PathVariable("id") Issue issue,
+            @ModelAttribute IssueReplyForm issueReplyForm,
+            BindingResult result, Model model) {
+
+        do {
+
+            if (result.hasErrors()) {
+                break;
+            }
+
+            Date now = new Date();
+            boolean hasReply = !StringUtils.isEmpty(issueReplyForm.getContent());
+
+            if (hasReply) {
+
+                IssueAction action = new IssueAction();
+                action.setIssueId(issue.getId());
+                action.setOperatorId(1L);
+                action.setAction(IssueAction.ACTION_REPLY);
+                action.setCreated(now);
+
+                try {
+                    JSONObject details = new JSONObject();
+                    details.put("content", issueReplyForm.getContent());
+                    action.setDetails(json.writeValueAsString(details));
+                } catch (Exception e) {
+                    result.addError(new ObjectError("content", "Fail to set content."));
+                    break;
+                }
+
+                issueActionRepository.save(action);
+
+                issue.setReplierId(action.getOperatorId());
+                issue.setReplied(action.getCreated());
+                issue.setReplyCount(issue.getReplyCount() + 1);
+                issueRepository.save(issue);
+            }
+
+            if (issueReplyForm.getClose()) {
+
+                issue.setStatus(Issue.STATUS_CLOSED);
+                issueRepository.save(issue);
+
+                IssueAction action = new IssueAction();
+                action.setIssueId(issue.getId());
+                action.setOperatorId(1L);
+                action.setAction(IssueAction.ACTION_CLOSE);
+                action.setCreated(now);
+                action.setDetails("{}");
+                issueActionRepository.save(action);
+
+            } else if (!hasReply) {
+
+                result.addError(new ObjectError("global", "Invalid request."));
+
+            }
+
+        } while (false);
+
+        renderIssueView(issue, model);
+        return "issue/view";
+    }
+
+    private void renderIssueView(Issue issue, Model model) {
 
         Set<Long> userIds = new HashSet<Long>();
         userIds.add(issue.getCreatorId());
 
         List<IssueAction> actions = new ArrayList<IssueAction>();
         Map<Long, JSONObject> details = new HashMap<Long, JSONObject>();
-        for (IssueAction action : issueActionRepository.findByIssueIdOrderByCreatedDesc(issue.getId())) {
+        for (IssueAction action : issueActionRepository.findByIssueIdOrderByCreatedAsc(issue.getId())) {
             actions.add(action);
 
             JSONObject detail;
@@ -138,7 +222,11 @@ public class IssueController {
         model.addAttribute("details", details);
         model.addAttribute("users", users);
         model.addAttribute("hashes", hashes);
-        return "issue/view";
+    }
+
+    @ModelAttribute("user")
+    public User getUser() {
+        return userRepository.findOne(1L);
     }
 
     @ModelAttribute("navbar")

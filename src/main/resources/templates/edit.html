@@ -10,14 +10,14 @@
 <div layout:fragment="content">
 
 <div class="row">
-  <div class="col-md-12">
-    <div class='subsite-title'>Edit Issue</div>
-  </div>
+  <div class="col-md-12 subsite-title">Edit Issue</div>
 </div>
+
+<hr/>
 
 <div class="row">
   <div class="col-md-12">
-    <form action="" method="post" th:object="${issue}">
+    <form action="" method="post" th:object="${issueForm}">
       <div class="form-group" th:classappend="${#fields.hasErrors('title')} ? has-error">
         <input type="text" class="form-control" placeholder="标题" th:field="*{title}"/>
       </div>

@@ -10,11 +10,13 @@
 <div layout:fragment="content">
 
 <div class="row">
-  <div class="col-md-12">
-    <div class="pull-right"><a class="btn btn-primary" th:href="@{/issue/add}">New Issue</a></div>
-    <div class='subsite-title'>Issues</div>
+  <div class="col-md-6 subsite-title">Issues</div>
+  <div class="col-md-6 text-right">
+    <a class="btn btn-primary" th:href="@{/issue/add}">New Issue</a>
   </div>
 </div>
+
+<hr/>
 
 <div class="row">
 

@@ -7,5 +7,5 @@ import org.springframework.data.repository.CrudRepository;
 import com.anjuke.dw.tools.model.IssueAction;
 
 public interface IssueActionRepository extends CrudRepository<IssueAction, Long>{
-    List<IssueAction> findByIssueIdOrderByCreatedDesc(long issueId);
+    List<IssueAction> findByIssueIdOrderByCreatedAsc(long issueId);
 }

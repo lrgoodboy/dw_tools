@@ -9,14 +9,16 @@
 <body>
 <div layout:fragment="content">
 
-<div class="row">
-  <div class="col-md-12 subsite-title-row">
-    <a class="btn btn-default pull-right" th:href="@{/issue/list}"><span class="glyphicon glyphicon-share-alt"></span> 返回</a>
-    <a class="btn btn-default pull-right" th:href="@{/issue/add}"><span class="glyphicon glyphicon-plus"></span> 新建</a>
-    <a class="btn btn-default pull-right" th:href="@{/issue/edit/{id}(id=${issue.id})}"><span class="glyphicon glyphicon-edit"></span> 编辑</a>
-    <div class='subsite-title'>Issue #<span th:text="${issue.id}"></span></div>
+<div class="row subsite-title-row">
+  <div class="col-md-6 subsite-title">Issue #<span th:text="${issue.id}"></span></div>
+  <div class="col-md-6 text-right">
+    <a class="btn btn-default" th:href="@{/issue/edit/{id}(id=${issue.id})}"><span class="glyphicon glyphicon-edit"></span> 编辑</a>
+    <a class="btn btn-default" th:href="@{/issue/add}"><span class="glyphicon glyphicon-plus"></span> 新建</a>
+    <a class="btn btn-default" th:href="@{/issue/list}"><span class="glyphicon glyphicon-share-alt"></span> 返回</a>
   </div>
 </div>
+
+<hr/>
 
 <div class="row">
   <div class="col-md-1">
@@ -40,7 +42,7 @@
   </div>
 </div>
 
-<div class="row action-row" th:each="action : ${actions}">
+<div class="row action-row" th:each="action : ${actions}" th:if="${action.action == 4}" >
   <div class="col-md-1">
     <a href="#" class="issue-avatar" data-toggle="tooltip" th:title="${users[action.operatorId].truename}">
       <img th:src="@{http://www.gravatar.com/avatar/{hash}?s=60(hash=${hashes[action.operatorId]})}" class="img-rounded" />
@@ -48,7 +50,7 @@
   </div>
   <div class="col-md-11">
     <div class="issue-item action-item">
-      <div th:if="${action.action == 4}" th:text="${details[action.id].get('reply')}" class="issue-content"></div>
+      <div th:text="${details[action.id].get('content')}" class="issue-content"></div>
       <div class="issue-footer text-muted">
         <a href="#" class="btn btn-link btn-xs pull-left"><span class="glyphicon glyphicon-edit"></span> 编辑</a>
         <a href="#" class="btn btn-link btn-xs pull-left"><span class="glyphicon glyphicon-remove"></span> 删除</a>
@@ -59,11 +61,59 @@
   </div>
 </div>
 
+<hr/>
+
+<div class="row">
+  <div class="col-md-1">
+    <a href="#" class="issue-avatar" data-toggle="tooltip" th:title="${users[session.user.id].truename}">
+      <img th:src="@{http://www.gravatar.com/avatar/{hash}?s=60(hash=${hashes[session.user.id]})}" class="img-rounded" />
+    </a>
+  </div>
+  <div class="col-md-11">
+    <div class="issue-item reply-item">
+      <div class="issue-content">
+        <form action="" method="post" th:object="${issueReplyForm}">
+          <div class="form-group">
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#">编辑</a></li>
+              <li><a href="#">预览</a></li>
+            </ul>
+          </div>
+          <div class="form-group" th:classappend="${#fields.hasErrors('content')} ? has-error">
+            <textarea class="form-control" rows="5" th:field="*{content}"></textarea>
+          </div>
+          <div class="row">
+            <div class="col-md-1" style="padding-top: 7px;">指定人：</div>
+            <div class="col-md-3">
+              <select class="form-control">
+                <option>不变</option>
+                <option>张三</option>
+                <option>李四</option>
+              </select>
+            </div>
+            <div class="col-md-8 text-right">
+              <button type="submit" class="btn btn-primary">提交</button>
+              <button type="submit" class="btn btn-default" id="btnClose">提交并关闭</button>
+              <input type="hidden" name="close" value="false" />
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 </div><!-- content -->
 
 <script type="text/javascript" layout:fragment="script">
 $(function() {
+
   $('.issue-avatar').tooltip({placement: 'bottom'});
+
+  $('#btnClose').click(function() {
+    $('[name="close"]').val('true');
+  });
+
 });
 </script>
 </body>

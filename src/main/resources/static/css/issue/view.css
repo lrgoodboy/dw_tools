@@ -31,6 +31,7 @@
   display: inline-block;
   width: 60px;
   height: 60px;
+  margin-bottom: 10px;
 }
 
 .action-row {
@@ -43,4 +44,12 @@
 
 .action-item:hover .btn {
   visibility: visible;
+}
+
+.reply-item textarea {
+  resize: vertical;
+}
+
+.reply-item .btn {
+  margin-left: 5px;
 }
