@@ -42,13 +42,41 @@
   </div>
 </div>
 
-<div class="row action-row" th:each="action : ${actions}" th:if="${action.action == 4}" >
-  <div class="col-md-1">
+<div class="row action-row" th:each="action : ${actions}">
+  <!-- open -->
+  <div class="col-md-11 col-md-offset-1" th:if="${action.action} == 1">
+    <div class="action-noreply">
+      <span class="text-warning"><span class="glyphicon glyphicon-edit"></span> 创建</span>
+      <img th:src="@{http://www.gravatar.com/avatar/{hash}?s=20(hash=${hashes[action.operatorId]})}" />
+      <a href="#" th:text="${users[action.operatorId].truename}"></a>
+      <span th:text="${#dates.format(action.created, 'yyyy-MM-dd HH:mm:ss')}" class="text-muted"></span>
+    </div>
+  </div>
+  <!-- close -->
+  <div class="col-md-11 col-md-offset-1" th:if="${action.action} == 2">
+    <div class="action-noreply">
+      <span class="text-success"><span class="glyphicon glyphicon-check"></span> 已关闭</span>
+      <img th:src="@{http://www.gravatar.com/avatar/{hash}?s=20(hash=${hashes[action.operatorId]})}" />
+      <a href="#" th:text="${users[action.operatorId].truename}"></a>
+      <span th:text="${#dates.format(action.created, 'yyyy-MM-dd HH:mm:ss')}" class="text-muted"></span>
+    </div>
+  </div>
+  <!-- reopen -->
+  <div class="col-md-11 col-md-offset-1" th:if="${action.action} == 3">
+    <div class="action-noreply">
+      <span class="text-danger"><span class="glyphicon glyphicon-share"></span> 重新开启</span>
+      <img th:src="@{http://www.gravatar.com/avatar/{hash}?s=20(hash=${hashes[action.operatorId]})}" />
+      <a href="#" th:text="${users[action.operatorId].truename}"></a>
+      <span th:text="${#dates.format(action.created, 'yyyy-MM-dd HH:mm:ss')}" class="text-muted"></span>
+    </div>
+  </div>
+  <!-- reply -->
+  <div class="col-md-1" th:if="${action.action} == 4">
     <a href="#" class="issue-avatar" data-toggle="tooltip" th:title="${users[action.operatorId].truename}">
       <img th:src="@{http://www.gravatar.com/avatar/{hash}?s=60(hash=${hashes[action.operatorId]})}" class="img-rounded" />
     </a>
   </div>
-  <div class="col-md-11">
+  <div class="col-md-11" th:if="${action.action} == 4">
     <div class="issue-item action-item">
       <div th:text="${details[action.id].get('content')}" class="issue-content"></div>
       <div class="issue-footer text-muted">
@@ -93,8 +121,8 @@
             </div>
             <div class="col-md-8 text-right">
               <button type="submit" class="btn btn-primary">提交</button>
-              <button type="submit" class="btn btn-default" id="btnClose">提交并关闭</button>
-              <input type="hidden" name="close" value="false" />
+              <button type="submit" class="btn btn-default" id="btnStatus" th:text="${issue.status} == 1 ? '提交并关闭' : '提交并打开'"></button>
+              <input type="hidden" name="status" value="false" />
             </div>
           </div>
         </form>
@@ -110,8 +138,8 @@ $(function() {
 
   $('.issue-avatar').tooltip({placement: 'bottom'});
 
-  $('#btnClose').click(function() {
-    $('[name="close"]').val('true');
+  $('#btnStatus').click(function() {
+    $('[name="status"]').val('true');
   });
 
 });

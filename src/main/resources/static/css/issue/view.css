@@ -53,3 +53,14 @@
 .reply-item .btn {
   margin-left: 5px;
 }
+
+.action-noreply {
+  line-height: 30px;
+  padding-left: 10px;
+}
+
+.action-noreply img {
+  margin-left: 15px;
+  display: inline-block;
+  border-radius: 3px;
+}

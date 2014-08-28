@@ -164,24 +164,34 @@ public class IssueController {
                 issueRepository.save(issue);
             }
 
-            if (issueReplyForm.getClose()) {
+            if (issueReplyForm.getStatus()) {
 
-                issue.setStatus(Issue.STATUS_CLOSED);
+                Integer newStatus, newAction;
+                if (issue.getStatus() == Issue.STATUS_OPENED) {
+                    newStatus = Issue.STATUS_CLOSED;
+                    newAction = IssueAction.ACTION_CLOSE;
+                } else {
+                    newStatus = Issue.STATUS_OPENED;
+                    newAction = IssueAction.ACTION_REOPEN;
+                }
+
+                issue.setStatus(newStatus);
                 issueRepository.save(issue);
 
                 IssueAction action = new IssueAction();
                 action.setIssueId(issue.getId());
                 action.setOperatorId(1L);
-                action.setAction(IssueAction.ACTION_CLOSE);
+                action.setAction(newAction);
                 action.setCreated(now);
                 action.setDetails("{}");
                 issueActionRepository.save(action);
 
             } else if (!hasReply) {
-
                 result.addError(new ObjectError("global", "Invalid request."));
-
+                break;
             }
+
+            issueReplyForm.setContent(null);
 
         } while (false);
 

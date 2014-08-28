@@ -20,13 +20,13 @@
 
 <div class="row">
 
-  <div class="col-md-2">
+  <div class="col-md-2" th:object="${issueFilterForm}">
 
     <div class="filter-header">状态</div>
     <ul class="nav nav-pills nav-stacked filter-body">
-      <li class="active"><a href="#"><span class="badge pull-right" th:text="${numOpened}"></span>未解决</a></li>
-      <li><a href="#">已关闭</a></li>
-      <li><a href="#">全部</a></li>
+      <li th:class="*{status} == 1 ? active"><a th:href="@{/issue/list(status=1)}"><span class="badge pull-right" th:text="${numOpened}"></span>未解决</a></li>
+      <li th:class="*{status} == 2 ? active"><a th:href="@{/issue/list(status=2)}">已关闭</a></li>
+      <li th:class="*{status} == null ? active"><a th:href="@{/issue/list(status=null)}">全部</a></li>
     </ul>
 
     <div class="filter-header">排序</div>
@@ -81,7 +81,7 @@
     <div class="issue-item" th:each="issue : ${issues}">
       <div class="issue-title">
         <span class="text-muted" th:text="'#' + ${issue.id}"></span>
-        <a th:href="@{/issue/view/{id}(id=${issue.id})}" th:text="${issue.title}"></a>
+        <a th:href="@{/issue/view/{id}(id=${issue.id})}" th:text="${issue.title}" th:class="${issue.status} == 2 ? text-muted"></a>
         <!--
         <span class="label label-success"><span class="glyphicon glyphicon-tag"></span> 流程</span>
         <span class="label label-success"><span class="glyphicon glyphicon-tag"></span> 问题</span>

@@ -6,17 +6,17 @@ import javax.validation.constraints.NotNull;
 public class IssueReplyForm {
     private String content;
     @NotNull
-    private Boolean close;
+    private Boolean status;
     public String getContent() {
         return content;
     }
     public void setContent(String content) {
         this.content = content;
     }
-    public Boolean getClose() {
-        return close;
+    public Boolean getStatus() {
+        return status;
     }
-    public void setClose(Boolean close) {
-        this.close = close;
+    public void setStatus(Boolean status) {
+        this.status = status;
     }
 }
