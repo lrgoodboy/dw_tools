@@ -24,4 +24,4 @@ $ git clone git@gitlab.corp.anjuke.com:_bi/dw_tools
 ```
 
 * Import into Eclipse as Maven project.
-* Open `Appliction.java`, click *Debug Application* button, and browse `http://127.0.0.1:8082/tools`.
+* Open `Appliction.java`, click *Debug Application* button, and browse `http://127.0.0.1:8913/tools`.

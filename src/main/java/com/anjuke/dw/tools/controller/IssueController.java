@@ -37,7 +37,6 @@ import com.anjuke.dw.tools.model.Issue;
 import com.anjuke.dw.tools.model.IssueAction;
 import com.anjuke.dw.tools.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsonorg.JsonOrgModule;
 
 @Controller
 @RequestMapping("/issue")
@@ -50,11 +49,8 @@ public class IssueController {
     private UserRepository userRepository;
     @Autowired
     private IssueActionRepository issueActionRepository;
-
-    private static ObjectMapper json = new ObjectMapper();
-    static {
-        json.registerModule(new JsonOrgModule());
-    }
+    @Autowired
+    private ObjectMapper json;
 
     @RequestMapping({"", "list"})
     public String list(@ModelAttribute IssueFilterForm issueFilterForm, Model model) {
