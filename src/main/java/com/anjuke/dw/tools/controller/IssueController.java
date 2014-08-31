@@ -96,7 +96,8 @@ public class IssueController {
     }
 
     @RequestMapping(value = "add", method = RequestMethod.POST)
-    public String addSubmit(@Valid @ModelAttribute IssueForm issueForm,
+    public String addSubmit(@ModelAttribute User currentUser,
+            @Valid @ModelAttribute IssueForm issueForm,
             BindingResult result, Model model) {
 
         validateContent(issueForm, result);
@@ -109,7 +110,7 @@ public class IssueController {
         BeanUtils.copyProperties(issueForm, issue);
         Date now = new Date();
         issue.setStatus(Issue.STATUS_OPENED);
-        issue.setCreatorId(1L);
+        issue.setCreatorId(currentUser.getId());
         issue.setAsigneeId(0L);
         issue.setReplierId(0L);
         issue.setReplyCount(0);
@@ -119,7 +120,7 @@ public class IssueController {
 
         IssueAction action = new IssueAction();
         action.setIssueId(issue.getId());
-        action.setOperatorId(1L);
+        action.setOperatorId(currentUser.getId());
         action.setAction(IssueAction.ACTION_OPEN);
         action.setDetails("{}");
         action.setCreated(now);
@@ -128,17 +129,19 @@ public class IssueController {
         return "redirect:/issue/view/" + issue.getId();
     }
 
-    @RequestMapping(value = "view/{id}", method = RequestMethod.GET)
-    public String view(@PathVariable("id") Issue issue,
+    @RequestMapping(value = "view/{issueId}", method = RequestMethod.GET)
+    public String view(@ModelAttribute User currentUser,
+            @PathVariable("issueId") Issue issue,
             @ModelAttribute IssueReplyForm issueReplyForm,
             Model model) {
 
-        renderIssueView(issue, model);
+        renderIssueView(issue, model, currentUser);
         return "issue/view";
     }
 
-    @RequestMapping(value = "view/{id}", method = RequestMethod.POST)
-    public String viewSubmit(@PathVariable("id") Issue issue,
+    @RequestMapping(value = "view/{issueId}", method = RequestMethod.POST)
+    public String viewSubmit(@ModelAttribute User currentUser,
+            @PathVariable("issueId") Issue issue,
             @ModelAttribute IssueReplyForm issueReplyForm,
             BindingResult result, Model model) {
 
@@ -164,7 +167,7 @@ public class IssueController {
 
                 IssueAction action = new IssueAction();
                 action.setIssueId(issue.getId());
-                action.setOperatorId(1L);
+                action.setOperatorId(currentUser.getId());
                 action.setAction(IssueAction.ACTION_REPLY);
                 action.setCreated(now);
 
@@ -201,7 +204,7 @@ public class IssueController {
 
                 IssueAction action = new IssueAction();
                 action.setIssueId(issue.getId());
-                action.setOperatorId(1L);
+                action.setOperatorId(currentUser.getId());
                 action.setAction(newAction);
                 action.setCreated(now);
                 action.setDetails("{}");
@@ -216,12 +219,12 @@ public class IssueController {
 
         } while (false);
 
-        renderIssueView(issue, model);
+        renderIssueView(issue, model, currentUser);
         return "issue/view";
     }
 
-    @RequestMapping(value = "edit/{id}", method = RequestMethod.GET)
-    public String edit(@PathVariable("id") Issue issue,
+    @RequestMapping(value = "edit/{issueId}", method = RequestMethod.GET)
+    public String edit(@PathVariable("issueId") Issue issue,
             @ModelAttribute IssueForm issueForm,
             Model model) {
 
@@ -229,8 +232,8 @@ public class IssueController {
         return "issue/edit";
     }
 
-    @RequestMapping(value = "edit/{id}", method = RequestMethod.POST)
-    public String editSubmit(@PathVariable("id") Issue issue,
+    @RequestMapping(value = "edit/{issueId}", method = RequestMethod.POST)
+    public String editSubmit(@PathVariable("issueId") Issue issue,
             @Valid @ModelAttribute IssueForm issueForm,
             BindingResult result, Model model) {
 
@@ -246,9 +249,10 @@ public class IssueController {
         return "redirect:/issue/view/" + issue.getId();
     }
 
-    private void renderIssueView(Issue issue, Model model) {
+    private void renderIssueView(Issue issue, Model model, User currentUser) {
 
         Set<Long> userIds = new HashSet<Long>();
+        userIds.add(currentUser.getId());
         userIds.add(issue.getCreatorId());
 
         PegDownProcessor md = new PegDownProcessor();
@@ -302,11 +306,6 @@ public class IssueController {
         if (content.isEmpty()) {
             result.rejectValue("content", "issueForm.content", "Content cannot be empty.");
         }
-    }
-
-    @ModelAttribute("user")
-    public User getUser() {
-        return userRepository.findOne(1L);
     }
 
     @ModelAttribute("navbar")
