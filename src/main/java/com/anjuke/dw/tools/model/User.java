@@ -1,5 +1,6 @@
 package com.anjuke.dw.tools.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -8,11 +9,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity
-public class User {
+public class User implements Serializable {
+
+    private static final long serialVersionUID = 1025380931554330409L;
 
     public static final int ROLE_ADMIN = 1;
     public static final int ROLE_DW = 2;
     public static final int ROLE_BI = 3;
+    public static final int ROLE_ANJUKE = 4;
 
     @Id @GeneratedValue
     private Long id;
