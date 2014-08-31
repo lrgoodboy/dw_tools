@@ -21,9 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.DigestUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -101,6 +99,8 @@ public class IssueController {
     public String addSubmit(@Valid @ModelAttribute IssueForm issueForm,
             BindingResult result, Model model) {
 
+        validateContent(issueForm, result);
+
         if (result.hasErrors()) {
             return "issue/edit";
         }
@@ -149,7 +149,16 @@ public class IssueController {
             }
 
             Date now = new Date();
-            boolean hasReply = !StringUtils.isEmpty(issueReplyForm.getContent());
+            boolean hasReply = false;
+
+            String content = issueReplyForm.getContent();
+            if (content != null) {
+                content = sanitizer.sanitize(content).trim();
+                issueReplyForm.setContent(content);
+                if (!content.isEmpty()) {
+                    hasReply = true;
+                }
+            }
 
             if (hasReply) {
 
@@ -164,7 +173,7 @@ public class IssueController {
                     details.put("content", issueReplyForm.getContent());
                     action.setDetails(json.writeValueAsString(details));
                 } catch (Exception e) {
-                    result.addError(new ObjectError("content", "Fail to set content."));
+                    result.rejectValue("content", "issueReplyForm.content", "Fail to set content.");
                     break;
                 }
 
@@ -199,7 +208,7 @@ public class IssueController {
                 issueActionRepository.save(action);
 
             } else if (!hasReply) {
-                result.addError(new ObjectError("global", "Invalid request."));
+                result.rejectValue("content", "issueReplyForm.content", "Comment cannot be empty.");
                 break;
             }
 
@@ -225,6 +234,8 @@ public class IssueController {
             @Valid @ModelAttribute IssueForm issueForm,
             BindingResult result, Model model) {
 
+        validateContent(issueForm, result);
+
         if (result.hasErrors()) {
             return "issue/edit";
         }
@@ -241,7 +252,7 @@ public class IssueController {
         userIds.add(issue.getCreatorId());
 
         PegDownProcessor md = new PegDownProcessor();
-        String issueMd = md.markdownToHtml(sanitizer.sanitize(issue.getContent()));
+        String issueMd = md.markdownToHtml(issue.getContent());
 
         List<IssueAction> actions = new ArrayList<IssueAction>();
         Map<Long, JSONObject> details = new HashMap<Long, JSONObject>();
@@ -258,7 +269,7 @@ public class IssueController {
             details.put(action.getId(), detail);
 
             userIds.add(action.getOperatorId());
-            actionMds.put(action.getId(), md.markdownToHtml(sanitizer.sanitize(detail.optString("content"))));
+            actionMds.put(action.getId(), md.markdownToHtml(detail.optString("content")));
         }
 
         Map<Long, User> users = new HashMap<Long, User>();
@@ -275,6 +286,22 @@ public class IssueController {
         model.addAttribute("hashes", hashes);
         model.addAttribute("issueMd", issueMd);
         model.addAttribute("actionMds", actionMds);
+    }
+
+    /**
+     * TODO use custom validator
+     */
+    private void validateContent(IssueForm issueForm, BindingResult result) {
+
+        if (result.hasErrors()) {
+            return;
+        }
+
+        String content = sanitizer.sanitize(issueForm.getContent()).trim();
+        issueForm.setContent(content);
+        if (content.isEmpty()) {
+            result.rejectValue("content", "issueForm.content", "Content cannot be empty.");
+        }
     }
 
     @ModelAttribute("user")
