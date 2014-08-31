@@ -11,6 +11,7 @@ import java.util.Set;
 import javax.validation.Valid;
 
 import org.json.JSONObject;
+import org.pegdown.PegDownProcessor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -200,8 +201,12 @@ public class IssueController {
         Set<Long> userIds = new HashSet<Long>();
         userIds.add(issue.getCreatorId());
 
+        PegDownProcessor md = new PegDownProcessor();
+        String issueMd = md.markdownToHtml(issue.getContent());
+
         List<IssueAction> actions = new ArrayList<IssueAction>();
         Map<Long, JSONObject> details = new HashMap<Long, JSONObject>();
+        Map<Long, String> actionMds = new HashMap<Long, String>();
         for (IssueAction action : issueActionRepository.findByIssueIdOrderByCreatedAsc(issue.getId())) {
             actions.add(action);
 
@@ -214,6 +219,7 @@ public class IssueController {
             details.put(action.getId(), detail);
 
             userIds.add(action.getOperatorId());
+            actionMds.put(action.getId(), md.markdownToHtml(detail.optString("content")));
         }
 
         Map<Long, User> users = new HashMap<Long, User>();
@@ -228,6 +234,8 @@ public class IssueController {
         model.addAttribute("details", details);
         model.addAttribute("users", users);
         model.addAttribute("hashes", hashes);
+        model.addAttribute("issueMd", issueMd);
+        model.addAttribute("actionMds", actionMds);
     }
 
     @ModelAttribute("user")

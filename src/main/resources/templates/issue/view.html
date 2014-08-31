@@ -35,7 +35,7 @@
         <span class="text-muted pull-right" th:if="${issue.status == 2}">已关闭</span>
         <span th:text="${issue.title}" class="issue-title"></span>
       </div>
-      <div th:text="${issue.content}" class="issue-content"></div>
+      <div th:utext="${issueMd}" class="issue-content"></div>
       <div class="issue-footer text-muted">
         <a href="#" th:text="${users[issue.creatorId].truename}"></a>
         <span th:text="${#dates.format(issue.created, 'yyyy-MM-dd HH:mm:ss')}"></span>
@@ -80,7 +80,7 @@
   </div>
   <div class="col-md-11" th:if="${action.action} == 4">
     <div class="issue-item action-item">
-      <div th:text="${details[action.id].get('content')}" class="issue-content"></div>
+      <div th:utext="${actionMds[action.id]}" class="issue-content"></div>
       <div class="issue-footer text-muted">
         <a href="#" class="btn btn-link btn-xs pull-left"><span class="glyphicon glyphicon-edit"></span> 编辑</a>
         <a href="#" class="btn btn-link btn-xs pull-left"><span class="glyphicon glyphicon-remove"></span> 删除</a>
