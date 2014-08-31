@@ -96,7 +96,7 @@ public class LoginController {
             }
 
             if (user != null) {
-                logger.info("Login by auth.");
+                logger.info("Login by auth: " + user.getUsername());
                 model.addAttribute("user", user);
 
                 Cookie cookie = new Cookie(COOKIE_NAME, getCookieToken(user.getId()));

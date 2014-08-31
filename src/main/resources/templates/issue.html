@@ -10,9 +10,9 @@
 <div layout:fragment="content">
 
 <div class="row">
-  <div class="col-md-6 subsite-title">Issues</div>
-  <div class="col-md-6 text-right">
-    <a class="btn btn-primary" th:href="@{/issue/add}">New Issue</a>
+  <div class="col-md-12">
+    <span class="subsite-title">Issues</span>
+    <a class="btn btn-primary pull-right" th:href="@{/issue/add}">New Issue</a>
   </div>
 </div>
 
@@ -20,7 +20,7 @@
 
 <div class="row">
 
-  <div class="col-md-2" th:object="${issueFilterForm}">
+  <div class="col-md-2 hidden-xs hidden-sm" th:object="${issueFilterForm}">
 
     <div class="filter-header">状态</div>
     <ul class="nav nav-pills nav-stacked filter-body">

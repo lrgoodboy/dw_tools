@@ -10,11 +10,13 @@
 <div layout:fragment="content">
 
 <div class="row subsite-title-row">
-  <div class="col-md-6 subsite-title">Issue #<span th:text="${issue.id}"></span></div>
-  <div class="col-md-6 text-right">
-    <a class="btn btn-default" th:href="@{/issue/edit/{id}(id=${issue.id})}"><span class="glyphicon glyphicon-edit"></span> 编辑</a>
-    <a class="btn btn-default" th:href="@{/issue/add}"><span class="glyphicon glyphicon-plus"></span> 新建</a>
-    <a class="btn btn-default" th:href="@{/issue/list}"><span class="glyphicon glyphicon-share-alt"></span> 返回</a>
+  <div class="col-md-12">
+    <span class="subsite-title">Issue #<span th:text="${issue.id}"></span></span>
+    <div class="pull-right">
+      <a class="btn btn-default" th:href="@{/issue/edit/{id}(id=${issue.id})}"><span class="glyphicon glyphicon-edit"></span> 编辑</a>
+      <a class="btn btn-default" th:href="@{/issue/add}"><span class="glyphicon glyphicon-plus"></span> 新建</a>
+      <a class="btn btn-default" th:href="@{/issue/list}"><span class="glyphicon glyphicon-share-alt"></span> 返回</a>
+    </div>
   </div>
 </div>
 
