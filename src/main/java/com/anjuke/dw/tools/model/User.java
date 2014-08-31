@@ -16,6 +16,7 @@ public class User implements Serializable {
     public static final int ROLE_ADMIN = 1;
     public static final int ROLE_DW = 2;
     public static final int ROLE_BI = 3;
+    public static final int ROLE_ANJUKE = 4;
 
     @Id @GeneratedValue
     private Long id;

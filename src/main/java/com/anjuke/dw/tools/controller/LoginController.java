@@ -109,7 +109,17 @@ public class LoginController {
             user.setUsername(info.getString("username"));
             user.setTruename(info.getString("name"));
             user.setEmail(info.getString("email"));
-            user.setRole(User.ROLE_BI); // TODO
+
+            if (info.getString("function_id").equals("11")) {
+                if (info.getString("department_name").contains("DW")) {
+                    user.setRole(User.ROLE_DW);
+                } else {
+                    user.setRole(User.ROLE_BI);
+                }
+            } else {
+                user.setRole(User.ROLE_ANJUKE);
+            }
+
             user.setCreated(new Date());
             userRepository.save(user);
         }
