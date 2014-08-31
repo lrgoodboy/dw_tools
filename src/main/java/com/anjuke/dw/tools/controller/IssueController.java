@@ -11,6 +11,8 @@ import java.util.Set;
 import javax.validation.Valid;
 
 import org.json.JSONObject;
+import org.owasp.html.HtmlPolicyBuilder;
+import org.owasp.html.PolicyFactory;
 import org.pegdown.PegDownProcessor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +54,19 @@ public class IssueController {
     private IssueActionRepository issueActionRepository;
     @Autowired
     private ObjectMapper json;
+
+    // https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/sanitization_filter.rb
+    private PolicyFactory sanitizer = new HtmlPolicyBuilder()
+            .allowAttributes("src").onElements("img")
+            .allowAttributes("href").onElements("a")
+            .allowAttributes("itemscope", "itemtype").onElements("div")
+            .allowStandardUrlProtocols()
+            .allowElements((
+                "h1 h2 h3 h4 h5 h6 h7 h8 br b i strong em a pre code img tt"
+                + " div ins del sup sub p ol ul table thead tbody tfoot blockquote"
+                + " dl dt dd kbd q samp var hr ruby rt rp li tr td th s strike"
+            ).split(" "))
+            .toFactory();
 
     @RequestMapping({"", "list"})
     public String list(@ModelAttribute IssueFilterForm issueFilterForm, Model model) {
@@ -202,7 +217,7 @@ public class IssueController {
         userIds.add(issue.getCreatorId());
 
         PegDownProcessor md = new PegDownProcessor();
-        String issueMd = md.markdownToHtml(issue.getContent());
+        String issueMd = md.markdownToHtml(sanitizer.sanitize(issue.getContent()));
 
         List<IssueAction> actions = new ArrayList<IssueAction>();
         Map<Long, JSONObject> details = new HashMap<Long, JSONObject>();
@@ -219,7 +234,7 @@ public class IssueController {
             details.put(action.getId(), detail);
 
             userIds.add(action.getOperatorId());
-            actionMds.put(action.getId(), md.markdownToHtml(detail.optString("content")));
+            actionMds.put(action.getId(), md.markdownToHtml(sanitizer.sanitize(detail.optString("content"))));
         }
 
         Map<Long, User> users = new HashMap<Long, User>();
