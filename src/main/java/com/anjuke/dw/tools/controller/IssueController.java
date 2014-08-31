@@ -89,12 +89,12 @@ public class IssueController {
         model.addAttribute("issues", issues);
         model.addAttribute("users", users);
         model.addAttribute("numOpened", issueRepository.countByStatus(Issue.STATUS_OPENED));
-        return "issue";
+        return "issue/list";
     }
 
     @RequestMapping(value = "add", method = RequestMethod.GET)
     public String add(@ModelAttribute IssueForm issueForm, Model model) {
-        return "edit";
+        return "issue/edit";
     }
 
     @RequestMapping(value = "add", method = RequestMethod.POST)
@@ -102,7 +102,7 @@ public class IssueController {
             BindingResult result, Model model) {
 
         if (result.hasErrors()) {
-            return "edit";
+            return "issue/edit";
         }
 
         Issue issue = new Issue();
@@ -125,7 +125,7 @@ public class IssueController {
         action.setCreated(now);
         issueActionRepository.save(action);
 
-        return "redirect:list";
+        return "redirect:/issue/view/" + issue.getId();
     }
 
     @RequestMapping(value = "view/{id}", method = RequestMethod.GET)
@@ -209,6 +209,30 @@ public class IssueController {
 
         renderIssueView(issue, model);
         return "issue/view";
+    }
+
+    @RequestMapping(value = "edit/{id}", method = RequestMethod.GET)
+    public String edit(@PathVariable("id") Issue issue,
+            @ModelAttribute IssueForm issueForm,
+            Model model) {
+
+        BeanUtils.copyProperties(issue, issueForm);
+        return "issue/edit";
+    }
+
+    @RequestMapping(value = "edit/{id}", method = RequestMethod.POST)
+    public String editSubmit(@PathVariable("id") Issue issue,
+            @Valid @ModelAttribute IssueForm issueForm,
+            BindingResult result, Model model) {
+
+        if (result.hasErrors()) {
+            return "issue/edit";
+        }
+
+        BeanUtils.copyProperties(issueForm, issue);
+        issueRepository.save(issue);
+
+        return "redirect:/issue/view/" + issue.getId();
     }
 
     private void renderIssueView(Issue issue, Model model) {
