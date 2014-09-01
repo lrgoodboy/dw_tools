@@ -32,6 +32,7 @@ public class EmailService {
 
     @PreDestroy
     public void preDestroy() {
+        logger.info("Shutdown email server.");
         executor.shutdown();
     }
 
