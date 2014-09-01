@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -74,7 +75,7 @@ public class LoginController {
 
         User user = null;
 
-        if (cookieToken != null) {
+        if (!StringUtils.isEmpty(cookieToken)) {
             try {
                 user = loginByCookie(cookieToken);
             } catch (Exception e) {

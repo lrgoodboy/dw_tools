@@ -324,11 +324,7 @@ public class IssueController {
                 truename, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(created),
                 emailBaseUrl, issueId);
 
-        try {
-            emailService.send(subject, content + signature, emailReceiver);
-        } catch (Exception e) {
-            logger.error("Fail to send email.", e);
-        }
+        emailService.sendAsync(subject, content + signature, emailReceiver);
     }
 
     private String renderMarkdown(String input) {
