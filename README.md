@@ -1,9 +1,9 @@
 DW Tools
 ========
 
-## Development Environment
+## 开发环境
 
-* Setup Maven mirror: (optional)
+* 配置Maven镜像（可选）：
 
 ```xml
 <!-- $HOME/.m2/settings.xml -->
@@ -17,11 +17,11 @@ DW Tools
 </settings>
 ```
 
-* Checkout code:
+* 获取代码
 
 ```bash
 $ git clone git@gitlab.corp.anjuke.com:_bi/dw_tools
 ```
 
-* Import into Eclipse as Maven project.
-* Open `Appliction.java`, click *Debug Application* button, and browse `http://127.0.0.1:8913/tools`.
+* 导入Eclipse（Maven项目）
+* 打开`Appliction.java`, 点击 **调试** 按钮，即可浏览 http://127.0.0.1:8913/tools
