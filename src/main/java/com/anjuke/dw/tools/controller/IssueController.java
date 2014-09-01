@@ -1,5 +1,6 @@
 package com.anjuke.dw.tools.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -14,8 +15,11 @@ import org.json.JSONObject;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
 import org.pegdown.PegDownProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
@@ -37,12 +41,15 @@ import com.anjuke.dw.tools.form.IssueReplyForm;
 import com.anjuke.dw.tools.model.Issue;
 import com.anjuke.dw.tools.model.IssueAction;
 import com.anjuke.dw.tools.model.User;
+import com.anjuke.dw.tools.service.EmailService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
 @RequestMapping("/issue")
 @SessionAttributes("user")
 public class IssueController {
+
+    private Logger logger = LoggerFactory.getLogger(IssueController.class);
 
     @Autowired
     private IssueRepository issueRepository;
@@ -52,6 +59,11 @@ public class IssueController {
     private IssueActionRepository issueActionRepository;
     @Autowired
     private ObjectMapper json;
+    @Autowired
+    private EmailService emailService;
+
+    @Value("${email.receiver}")
+    private String emailReceiver;
 
     // https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/sanitization_filter.rb
     private PolicyFactory sanitizer = new HtmlPolicyBuilder()
@@ -126,6 +138,16 @@ public class IssueController {
         action.setCreated(now);
         issueActionRepository.save(action);
 
+        try {
+            PegDownProcessor md = new PegDownProcessor();
+            emailService.send(
+                    String.format("Issue#%d %s", issue.getId(), issue.getTitle()),
+                    md.markdownToHtml(issue.getContent()) + renderSignature(currentUser, issue.getCreated(), issue.getId()),
+                    emailReceiver);
+        } catch (Exception e) {
+            logger.error("Fail to send email.", e);
+        }
+
         return "redirect:/issue/view/" + issue.getId();
     }
 
@@ -186,6 +208,16 @@ public class IssueController {
                 issue.setReplied(action.getCreated());
                 issue.setReplyCount(issue.getReplyCount() + 1);
                 issueRepository.save(issue);
+
+                try {
+                    PegDownProcessor md = new PegDownProcessor();
+                    emailService.send(
+                            String.format("Re: Issue#%d %s", issue.getId(), issue.getTitle()),
+                            md.markdownToHtml(issueReplyForm.getContent()) + renderSignature(currentUser, action.getCreated(), issue.getId()),
+                            emailReceiver);
+                } catch (Exception e) {
+                    logger.error("Fail to send email.", e);
+                }
             }
 
             if (issueReplyForm.getStatus()) {
@@ -243,7 +275,7 @@ public class IssueController {
             return "issue/edit";
         }
 
-        BeanUtils.copyProperties(issueForm, issue);
+        BeanUtils.copyProperties(issueForm, issue, "id");
         issueRepository.save(issue);
 
         return "redirect:/issue/view/" + issue.getId();
@@ -306,6 +338,15 @@ public class IssueController {
         if (content.isEmpty()) {
             result.rejectValue("content", "issueForm.content", "Content cannot be empty.");
         }
+    }
+
+    @Value("${email.baseurl}")
+    private String emailBaseUrl;
+
+    private String renderSignature(User currentUser, Date created, Long issueId) {
+        return String.format("<p style=\"color: gray; margin-top: 30px;\">--<br>%s %s <a href=\"%s/issue/view/%d\">查看详情</a></p>",
+                currentUser.getTruename(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(created),
+                emailBaseUrl, issueId);
     }
 
     @ModelAttribute("navbar")

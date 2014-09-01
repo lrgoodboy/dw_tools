@@ -23,7 +23,7 @@
 <hr/>
 
 <div class="row">
-  <div class="col-md-1">
+  <div class="col-md-1 hidden-xs hidden-sm">
     <a href="#" class="issue-avatar" data-toggle="tooltip" th:title="${users[issue.creatorId].truename}">
       <img th:src="@{http://www.gravatar.com/avatar/{hash}?s=60(hash=${hashes[issue.creatorId]})}" class="img-rounded" />
     </a>
@@ -45,8 +45,7 @@
 </div>
 
 <div class="row action-row" th:each="action : ${actions}">
-  <!-- open -->
-  <div class="col-md-11 col-md-offset-1" th:if="${action.action} == 1">
+  <div class="col-md-11 col-md-offset-1" th:if="${action.action} == ${action.ACTION_OPEN}">
     <div class="action-noreply">
       <span class="text-warning"><span class="glyphicon glyphicon-edit"></span> 创建</span>
       <img th:src="@{http://www.gravatar.com/avatar/{hash}?s=20(hash=${hashes[action.operatorId]})}" />
@@ -54,8 +53,7 @@
       <span th:text="${#dates.format(action.created, 'yyyy-MM-dd HH:mm:ss')}" class="text-muted"></span>
     </div>
   </div>
-  <!-- close -->
-  <div class="col-md-11 col-md-offset-1" th:if="${action.action} == 2">
+  <div class="col-md-11 col-md-offset-1" th:if="${action.action} == ${action.ACTION_CLOSE}">
     <div class="action-noreply">
       <span class="text-success"><span class="glyphicon glyphicon-check"></span> 已关闭</span>
       <img th:src="@{http://www.gravatar.com/avatar/{hash}?s=20(hash=${hashes[action.operatorId]})}" />
@@ -63,8 +61,7 @@
       <span th:text="${#dates.format(action.created, 'yyyy-MM-dd HH:mm:ss')}" class="text-muted"></span>
     </div>
   </div>
-  <!-- reopen -->
-  <div class="col-md-11 col-md-offset-1" th:if="${action.action} == 3">
+  <div class="col-md-11 col-md-offset-1" th:if="${action.action} == ${action.ACTION_REOPEN}">
     <div class="action-noreply">
       <span class="text-danger"><span class="glyphicon glyphicon-share"></span> 重新开启</span>
       <img th:src="@{http://www.gravatar.com/avatar/{hash}?s=20(hash=${hashes[action.operatorId]})}" />
@@ -72,8 +69,7 @@
       <span th:text="${#dates.format(action.created, 'yyyy-MM-dd HH:mm:ss')}" class="text-muted"></span>
     </div>
   </div>
-  <!-- reply -->
-  <div class="col-md-1" th:if="${action.action} == 4">
+  <div class="col-md-1 hidden-xs hidden-sm" th:if="${action.action} == ${action.ACTION_REPLY}">
     <a href="#" class="issue-avatar" data-toggle="tooltip" th:title="${users[action.operatorId].truename}">
       <img th:src="@{http://www.gravatar.com/avatar/{hash}?s=60(hash=${hashes[action.operatorId]})}" class="img-rounded" />
     </a>
@@ -94,7 +90,7 @@
 <hr/>
 
 <div class="row">
-  <div class="col-md-1">
+  <div class="col-md-1 hidden-xs hidden-sm">
     <a href="#" class="issue-avatar" data-toggle="tooltip" th:title="${users[session.user.id].truename}">
       <img th:src="@{http://www.gravatar.com/avatar/{hash}?s=60(hash=${hashes[session.user.id]})}" class="img-rounded" />
     </a>
@@ -113,6 +109,7 @@
             <textarea class="form-control" rows="5" th:field="*{content}"></textarea>
           </div>
           <div class="row">
+            <!--
             <div class="col-md-1" style="padding-top: 7px;">指定人：</div>
             <div class="col-md-3">
               <select class="form-control">
@@ -121,7 +118,8 @@
                 <option>李四</option>
               </select>
             </div>
-            <div class="col-md-8 text-right">
+            -->
+            <div class="col-md-12 text-right">
               <button type="submit" class="btn btn-primary">提交</button>
               <button type="submit" class="btn btn-default" id="btnStatus" th:text="${issue.status} == 1 ? '提交并关闭' : '提交并打开'"></button>
               <input type="hidden" name="status" value="false" />
