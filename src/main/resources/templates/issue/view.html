@@ -79,7 +79,7 @@
       <div th:utext="${actionMds[action.id]}" class="issue-content"></div>
       <div class="issue-footer text-muted">
         <a href="#" class="btn btn-link btn-xs pull-left"><span class="glyphicon glyphicon-edit"></span> 编辑</a>
-        <a href="#" class="btn btn-link btn-xs pull-left"><span class="glyphicon glyphicon-remove"></span> 删除</a>
+        <a href="javascript:void(0);" class="btn btn-link btn-xs pull-left" th:attr="delete_id=${action.id}"><span class="glyphicon glyphicon-remove"></span> 删除</a>
         <a href="#" th:text="${users[action.operatorId].truename}"></a>
         <span th:text="${#dates.format(action.created, 'yyyy-MM-dd HH:mm:ss')}"></span>
       </div>
@@ -133,13 +133,24 @@
 
 </div><!-- content -->
 
-<script type="text/javascript" layout:fragment="script">
+<script type="text/javascript" th:inline="javascript" layout:fragment="script">
+var contextPath = [[${#httpServletRequest.contextPath}]];
 $(function() {
 
   $('.issue-avatar').tooltip({placement: 'bottom'});
 
   $('#btnStatus').click(function() {
     $('[name="status"]').val('true');
+  });
+
+  $('[delete_id]').click(function() {
+    if (!confirm('确定要删除吗？')) {
+        return false;
+    }
+    var that = this;
+    $.get(contextPath + '/issue/action/delete/' + $(this).attr('delete_id'), function() {
+      $(that).parents('.action-row').slideUp();
+    });
   });
 
 });
