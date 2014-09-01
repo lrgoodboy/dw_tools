@@ -47,6 +47,7 @@ import com.anjuke.dw.tools.model.Issue;
 import com.anjuke.dw.tools.model.IssueAction;
 import com.anjuke.dw.tools.model.User;
 import com.anjuke.dw.tools.service.EmailService;
+import com.anjuke.dw.tools.service.IssueService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
@@ -66,6 +67,8 @@ public class IssueController {
     private ObjectMapper json;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private IssueService issueService;
 
     @Value("${email.receiver}")
     private String emailReceiver;
@@ -205,11 +208,7 @@ public class IssueController {
                 }
 
                 issueActionRepository.save(action);
-
-                issue.setReplierId(action.getOperatorId());
-                issue.setReplied(action.getCreated());
-                issue.setReplyCount(issue.getReplyCount() + 1);
-                issueRepository.save(issue);
+                issueService.buildAsync(issue.getId());
 
                 sendEmail(String.format("Re: Issue#%d %s", issue.getId(), issue.getTitle()), issueReplyForm.getContent(),
                         currentUser.getTruename(), action.getCreated(), action.getIssueId());

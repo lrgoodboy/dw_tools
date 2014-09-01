@@ -32,7 +32,6 @@ public class EmailService {
 
     @PreDestroy
     public void preDestroy() {
-        logger.info("Shutdown email server.");
         executor.shutdown();
     }
 
@@ -83,7 +82,7 @@ public class EmailService {
             try {
                 send(subject, html, receivers);
             } catch (Exception e) {
-                logger.error("Fail to send email.", e);
+                logger.error("Fail to send email - " + e.getMessage());
             }
         }
 
