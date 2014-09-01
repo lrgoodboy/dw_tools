@@ -33,7 +33,7 @@ public class GreetingTest {
     @Test
     public void greeting() throws Exception {
         this.mockMvc.perform(get("/greeting").accept(MediaType.parseMediaType("text/html;charset=utf-8")))
-            .andExpect(status().isOk());
+            .andExpect(status().isNotFound());
     }
 
 }
