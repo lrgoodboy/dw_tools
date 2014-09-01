@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -108,6 +109,16 @@ public class LoginController {
         }
 
         return redirect(getAuthUrl(from));
+    }
+
+    @RequestMapping("/logout")
+    public View logout(SessionStatus status, HttpServletResponse response) {
+        status.setComplete();
+        response.addCookie(new Cookie(COOKIE_NAME, null));
+        return redirect(UriComponentsBuilder.fromHttpUrl(oauthUrl).path("/logout.php")
+                .queryParam("client_id", oauthClient)
+                .queryParam("client_secret", oauthSecret)
+                .build().toUriString());
     }
 
     private RedirectView redirect(String url) {

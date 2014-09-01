@@ -26,8 +26,8 @@
         <li th:class="${navbar} == 'issue' ? active"><a th:href="@{/issue}">Issues</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="#">张三</a></li>
-        <li><a href="#">退出</a></li>
+        <li><a href="#" th:text="${session.user.truename}"></a></li>
+        <li><a th:href="@{/logout}">退出</a></li>
       </ul>
     </div>
   </div>
