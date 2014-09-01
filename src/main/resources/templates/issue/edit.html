@@ -1,0 +1,44 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorator="layout">
+<head>
+<title>Edit Issue</title>
+<link th:href="@{/css/issue/edit.css}" rel="stylesheet" />
+</head>
+<body>
+<div layout:fragment="content">
+
+<div class="row">
+  <div class="col-md-12">
+    <span class="subsite-title">Edit Issue</span>
+  </div>
+</div>
+
+<hr/>
+
+<div class="row">
+  <div class="col-md-12">
+    <form action="" method="post" th:object="${issueForm}">
+      <div class="form-group" th:classappend="${#fields.hasErrors('title')} ? has-error">
+        <input type="text" class="form-control" placeholder="标题" th:field="*{title}"/>
+      </div>
+      <div class="form-group">
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#">编辑</a></li>
+          <li><a href="#">预览</a></li>
+        </ul>
+      </div>
+      <div class="form-group" th:classappend="${#fields.hasErrors('content')} ? has-error">
+        <textarea class="form-control" rows="15" th:field="*{content}"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">提交</button>
+      <a th:href="@{/issue/list}" class="btn btn-default" th:if="*{id} == null">取消</a>
+      <a th:href="@{/issue/view/{id}(id=*{id})}" class="btn btn-default" th:if="*{id} != null">取消</a>
+    </form>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

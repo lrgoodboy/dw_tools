@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorator="layout">
+<head>
+<title>Issues</title>
+<link th:href="@{/css/issue/list.css}" rel="stylesheet" />
+</head>
+<body>
+<div layout:fragment="content">
+
+<div class="row">
+  <div class="col-md-12">
+    <span class="subsite-title">Issues</span>
+    <a class="btn btn-primary pull-right" th:href="@{/issue/add}">New Issue</a>
+  </div>
+</div>
+
+<hr/>
+
+<div class="row">
+
+  <div class="col-md-2 hidden-xs hidden-sm" th:object="${issueFilterForm}">
+
+    <div class="filter-header">状态</div>
+    <ul class="nav nav-pills nav-stacked filter-body">
+      <li th:class="*{status} == 1 ? active"><a th:href="@{/issue/list(status=1)}"><span class="badge pull-right" th:text="${numOpened}"></span>未解决</a></li>
+      <li th:class="*{status} == 2 ? active"><a th:href="@{/issue/list(status=2)}">已关闭</a></li>
+      <li th:class="*{status} == null ? active"><a th:href="@{/issue/list(status=null)}">全部</a></li>
+    </ul>
+
+    <div class="filter-header">排序</div>
+    <div class="btn-group btn-block filter-body">
+      <button type="button" class="btn btn-block btn-default dropdown-toggle" data-toggle="dropdown">
+        按更新时间倒序 <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu btn-block">
+        <li><a href="#">按创建时间顺序</a></li>
+        <li><a href="#">按创建时间倒序</a></li>
+        <li><a href="#">按更新时间顺序</a></li>
+        <li><a href="#">按更新时间倒序</a></li>
+      </ul>
+    </div>
+
+    <div class="filter-header">创建人</div>
+    <div class="btn-group btn-block filter-body">
+      <button type="button" class="btn btn-block btn-default dropdown-toggle" data-toggle="dropdown">
+        全部 <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu btn-block">
+        <li><a href="#">全部</a></li>
+      </ul>
+    </div>
+
+    <div class="filter-header">处理人</div>
+    <div class="btn-group btn-block filter-body">
+      <button type="button" class="btn btn-block btn-default dropdown-toggle" data-toggle="dropdown">
+        全部 <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu btn-block">
+        <li><a href="#">全部</a></li>
+      </ul>
+    </div>
+
+    <div class="filter-header">标签</div>
+    <ul class="nav nav-pills nav-stacked filter-body">
+      <li class="active"><a href="#"><span class="glyphicon glyphicon-tag"></span> 全部</a></li>
+    </ul>
+
+  </div>
+
+  <div class="col-md-10">
+
+    <div class="issue-item" th:each="issue : ${issues}">
+      <div class="issue-title">
+        <span class="text-muted" th:text="'#' + ${issue.id}"></span>
+        <a th:href="@{/issue/view/{id}(id=${issue.id})}" th:text="${issue.title}" th:class="${issue.status} == 2 ? text-muted"></a>
+        <!--
+        <span class="label label-success"><span class="glyphicon glyphicon-tag"></span> 流程</span>
+        <span class="label label-success"><span class="glyphicon glyphicon-tag"></span> 问题</span>
+        -->
+      </div>
+      <div class="issue-info text-muted">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <a href="#" th:text="${users[issue.creatorId].truename}"></a>创建于<span th:text="${#dates.format(issue.created, 'yyyy-MM-dd HH:mm:ss')}"></span>
+        <span class="issue-info-separator"></span>
+        <span class="glyphicon glyphicon-user"></span>
+        <span th:if="${issue.asigneeId == 0}">未指定处理人</span>
+        <span th:if="${issue.asigneeId > 0}">处理人<a href="#" th:text="${users[issue.asigneeId].truename}"></a></span>
+        <span class="issue-info-separator"></span>
+        <span class="glyphicon glyphicon-comment"></span>
+        <span th:if="${issue.replyCount == 0}">没有回复</span>
+        <span th:if="${issue.replyCount > 0}">共<span th:text="${issue.replyCount}"></span>个回复，<a href="#" th:text="${users[issue.replierId].truename}"></a>最后回复于<span th:text="${#dates.format(issue.replied, 'yyyy-MM-dd HH:mm:ss')}"></span></span>
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- row -->
+
+</div><!-- content -->
+
+<script type="text/javascript">
+console.log('test');
+</script>
+</body>
+</html>

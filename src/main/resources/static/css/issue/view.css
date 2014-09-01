@@ -1,0 +1,66 @@
+.subsite-title-row .btn {
+  margin-left: 5px;
+}
+
+.issue-item {
+  border: 1px solid #eee;
+  border-radius: 5px;
+}
+
+.issue-header {
+  background-color: #f8f8f8;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.issue-title {
+  font-weight: bold;
+}
+
+.issue-content {
+  padding: 10px;
+}
+
+.issue-footer {
+  padding: 5px;
+  border-top: 1px solid #f8f8f8;
+  text-align: right;
+}
+
+.issue-avatar {
+  display: inline-block;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 10px;
+}
+
+.action-row {
+  margin-top: 15px;
+}
+
+.action-item .btn {
+  visibility: hidden;
+}
+
+.action-item:hover .btn {
+  visibility: visible;
+}
+
+.reply-item textarea {
+  resize: vertical;
+}
+
+.reply-item .btn {
+  margin-left: 5px;
+}
+
+.action-noreply {
+  line-height: 30px;
+  padding-left: 10px;
+}
+
+.action-noreply img {
+  margin-left: 15px;
+  display: inline-block;
+  border-radius: 3px;
+}

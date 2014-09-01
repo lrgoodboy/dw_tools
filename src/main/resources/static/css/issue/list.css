@@ -1,0 +1,33 @@
+.filter-header {
+  font-size: 14px;
+  font-weight: bold;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.filter-body {
+  margin: 10px 0;
+}
+
+.issue-item {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.issue-item:hover {
+  background-color: #f8f8f8;
+}
+
+.issue-title {
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.issue-info {
+  font-size: 12px;
+}
+
+.issue-info-separator {
+  display: inline-block;
+  width: 15px;
+}
