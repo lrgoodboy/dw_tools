@@ -14,7 +14,11 @@ import javax.validation.Valid;
 import org.json.JSONObject;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
+import org.pegdown.LinkRenderer;
 import org.pegdown.PegDownProcessor;
+import org.pegdown.ToHtmlSerializer;
+import org.pegdown.ast.CodeNode;
+import org.pegdown.ast.RootNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -25,6 +29,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.DigestUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -64,6 +69,8 @@ public class IssueController {
 
     @Value("${email.receiver}")
     private String emailReceiver;
+    @Value("${email.baseurl}")
+    private String emailBaseUrl;
 
     // https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/sanitization_filter.rb
     private PolicyFactory sanitizer = new HtmlPolicyBuilder()
@@ -77,6 +84,19 @@ public class IssueController {
                 + " dl dt dd kbd q samp var hr ruby rt rp li tr td th s strike"
             ).split(" "))
             .toFactory();
+
+   private class CustomToHtmlSerializer extends ToHtmlSerializer {
+
+        public CustomToHtmlSerializer() {
+            super(new LinkRenderer());
+        }
+
+        @Override
+        public void visit(CodeNode node) {
+            printer.print("<pre><code>" + node.getText().trim() + "</code></pre>");
+        }
+
+    }
 
     @RequestMapping({"", "list"})
     public String list(@ModelAttribute IssueFilterForm issueFilterForm, Model model) {
@@ -112,8 +132,6 @@ public class IssueController {
             @Valid @ModelAttribute IssueForm issueForm,
             BindingResult result, Model model) {
 
-        validateContent(issueForm, result);
-
         if (result.hasErrors()) {
             return "issue/edit";
         }
@@ -138,15 +156,8 @@ public class IssueController {
         action.setCreated(now);
         issueActionRepository.save(action);
 
-        try {
-            PegDownProcessor md = new PegDownProcessor();
-            emailService.send(
-                    String.format("Issue#%d %s", issue.getId(), issue.getTitle()),
-                    md.markdownToHtml(issue.getContent()) + renderSignature(currentUser, issue.getCreated(), issue.getId()),
-                    emailReceiver);
-        } catch (Exception e) {
-            logger.error("Fail to send email.", e);
-        }
+        sendEmail(String.format("Issue#%d %s", issue.getId(), issue.getTitle()), issue.getContent(),
+                currentUser.getTruename(), issue.getCreated(), issue.getId());
 
         return "redirect:/issue/view/" + issue.getId();
     }
@@ -174,16 +185,7 @@ public class IssueController {
             }
 
             Date now = new Date();
-            boolean hasReply = false;
-
-            String content = issueReplyForm.getContent();
-            if (content != null) {
-                content = sanitizer.sanitize(content).trim();
-                issueReplyForm.setContent(content);
-                if (!content.isEmpty()) {
-                    hasReply = true;
-                }
-            }
+            boolean hasReply = !StringUtils.isEmpty(issueReplyForm.getContent());
 
             if (hasReply) {
 
@@ -209,15 +211,8 @@ public class IssueController {
                 issue.setReplyCount(issue.getReplyCount() + 1);
                 issueRepository.save(issue);
 
-                try {
-                    PegDownProcessor md = new PegDownProcessor();
-                    emailService.send(
-                            String.format("Re: Issue#%d %s", issue.getId(), issue.getTitle()),
-                            md.markdownToHtml(issueReplyForm.getContent()) + renderSignature(currentUser, action.getCreated(), issue.getId()),
-                            emailReceiver);
-                } catch (Exception e) {
-                    logger.error("Fail to send email.", e);
-                }
+                sendEmail(String.format("Re: Issue#%d %s", issue.getId(), issue.getTitle()), issueReplyForm.getContent(),
+                        currentUser.getTruename(), action.getCreated(), action.getIssueId());
             }
 
             if (issueReplyForm.getStatus()) {
@@ -269,8 +264,6 @@ public class IssueController {
             @Valid @ModelAttribute IssueForm issueForm,
             BindingResult result, Model model) {
 
-        validateContent(issueForm, result);
-
         if (result.hasErrors()) {
             return "issue/edit";
         }
@@ -287,8 +280,7 @@ public class IssueController {
         userIds.add(currentUser.getId());
         userIds.add(issue.getCreatorId());
 
-        PegDownProcessor md = new PegDownProcessor();
-        String issueMd = md.markdownToHtml(issue.getContent());
+        String issueMd = renderMarkdown(issue.getContent());
 
         List<IssueAction> actions = new ArrayList<IssueAction>();
         Map<Long, JSONObject> details = new HashMap<Long, JSONObject>();
@@ -305,7 +297,7 @@ public class IssueController {
             details.put(action.getId(), detail);
 
             userIds.add(action.getOperatorId());
-            actionMds.put(action.getId(), md.markdownToHtml(detail.optString("content")));
+            actionMds.put(action.getId(), renderMarkdown(detail.optString("content")));
         }
 
         Map<Long, User> users = new HashMap<Long, User>();
@@ -324,29 +316,25 @@ public class IssueController {
         model.addAttribute("actionMds", actionMds);
     }
 
-    /**
-     * TODO use custom validator
-     */
-    private void validateContent(IssueForm issueForm, BindingResult result) {
+    private void sendEmail(String subject, String content, String truename, Date created, Long issueId) {
 
-        if (result.hasErrors()) {
-            return;
-        }
+        content = renderMarkdown(content);
 
-        String content = sanitizer.sanitize(issueForm.getContent()).trim();
-        issueForm.setContent(content);
-        if (content.isEmpty()) {
-            result.rejectValue("content", "issueForm.content", "Content cannot be empty.");
+        String signature = String.format("<p style=\"color: gray; margin-top: 30px;\">--<br>%s %s <a href=\"%s/issue/view/%d\">查看详情</a></p>",
+                truename, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(created),
+                emailBaseUrl, issueId);
+
+        try {
+            emailService.send(subject, content + signature, emailReceiver);
+        } catch (Exception e) {
+            logger.error("Fail to send email.", e);
         }
     }
 
-    @Value("${email.baseurl}")
-    private String emailBaseUrl;
-
-    private String renderSignature(User currentUser, Date created, Long issueId) {
-        return String.format("<p style=\"color: gray; margin-top: 30px;\">--<br>%s %s <a href=\"%s/issue/view/%d\">查看详情</a></p>",
-                currentUser.getTruename(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(created),
-                emailBaseUrl, issueId);
+    private String renderMarkdown(String input) {
+        PegDownProcessor peg = new PegDownProcessor();
+        RootNode astRoot = peg.parseMarkdown(input.toCharArray());
+        return sanitizer.sanitize(new CustomToHtmlSerializer().toHtml(astRoot));
     }
 
     @ModelAttribute("navbar")
