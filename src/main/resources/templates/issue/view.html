@@ -78,7 +78,9 @@
     <div class="issue-item action-item">
       <div th:utext="${actionMds[action.id]}" class="issue-content"></div>
       <div class="issue-footer text-muted">
+        <!--
         <a href="#" class="btn btn-link btn-xs pull-left"><span class="glyphicon glyphicon-edit"></span> 编辑</a>
+        -->
         <a href="javascript:void(0);" class="btn btn-link btn-xs pull-left" th:attr="delete_id=${action.id}"><span class="glyphicon glyphicon-remove"></span> 删除</a>
         <a href="#" th:text="${users[action.operatorId].truename}"></a>
         <span th:text="${#dates.format(action.created, 'yyyy-MM-dd HH:mm:ss')}"></span>
@@ -101,13 +103,19 @@
         <form action="" method="post" th:object="${issueReplyForm}">
           <div class="form-group">
             <ul class="nav nav-tabs">
-              <li class="active"><a href="#">编辑</a></li>
-              <li><a href="#">预览</a></li>
+              <li class="active"><a href="#tabEdit" data-toggle="tab">编辑</a></li>
+              <li><a href="#tabPreview" data-toggle="tab" id="btnPreview">预览</a></li>
             </ul>
           </div>
-          <div class="form-group" th:classappend="${#fields.hasErrors('content')} ? has-error">
-            <textarea class="form-control" rows="5" th:field="*{content}"></textarea>
+          <div class="tab-content">
+            <div class="tab-pane active" id="tabEdit">
+              <div class="form-group" th:classappend="${#fields.hasErrors('content')} ? has-error">
+                <textarea class="form-control" rows="5" th:field="*{content}"></textarea>
+              </div>
+            </div>
+            <div class="tab-pane" id="tabPreview"></div>
           </div>
+
           <div class="row">
             <!--
             <div class="col-md-1" style="padding-top: 7px;">指定人：</div>
@@ -134,26 +142,10 @@
 </div><!-- content -->
 
 <th:block layout:fragment="scripts">
+<script type="text/javascript" th:src="@{/js/issue/view.js}"></script>
 <script type="text/javascript" th:inline="javascript">
-var contextPath = [[${#httpServletRequest.contextPath}]];
-$(function() {
-
-  $('.issue-avatar').tooltip({placement: 'bottom'});
-
-  $('#btnStatus').click(function() {
-    $('[name="status"]').val('true');
-  });
-
-  $('[delete_id]').click(function() {
-    if (!confirm('确定要删除吗？')) {
-        return false;
-    }
-    var that = this;
-    $.get(contextPath + '/issue/action/delete/' + $(this).attr('delete_id'), function() {
-      $(that).parents('.action-row').slideUp();
-    });
-  });
-
+new IssueView({
+    contextPath: [[${#httpServletRequest.contextPath}]]
 });
 </script>
 </th:block>
