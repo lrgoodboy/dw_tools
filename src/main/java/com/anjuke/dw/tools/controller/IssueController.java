@@ -2,6 +2,7 @@ package com.anjuke.dw.tools.controller;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,6 +50,7 @@ import com.anjuke.dw.tools.model.Issue;
 import com.anjuke.dw.tools.model.IssueAction;
 import com.anjuke.dw.tools.model.User;
 import com.anjuke.dw.tools.service.EmailService;
+import com.anjuke.dw.tools.service.EmailService.Email;
 import com.anjuke.dw.tools.service.IssueService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -331,7 +333,12 @@ public class IssueController {
                 truename, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(created),
                 emailBaseUrl, issueId);
 
-        emailService.sendAsync(subject, content + signature, emailReceiver);
+        Email email = new Email();
+        email.setSubject(subject);
+        email.setHtml(content + signature);
+        email.setSender(truename);
+        email.setReceivers(Arrays.asList(emailReceiver));
+        emailService.sendAsync(email);
     }
 
     private String renderMarkdown(String input) {
