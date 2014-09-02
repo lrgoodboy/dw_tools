@@ -35,6 +35,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.anjuke.dw.tools.dao.IssueActionRepository;
@@ -271,6 +273,12 @@ public class IssueController {
         issueRepository.save(issue);
 
         return "redirect:/issue/view/" + issue.getId();
+    }
+
+    @RequestMapping(value = "preview", method = RequestMethod.POST, produces = "text/html;charset=utf-8")
+    @ResponseBody
+    public String preview(@RequestParam("content") String content) {
+        return renderMarkdown(content);
     }
 
     private void renderIssueView(Issue issue, Model model, User currentUser) {
