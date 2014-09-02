@@ -3,6 +3,7 @@
   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
 <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title layout:title-pattern="$DECORATOR_TITLE - $CONTENT_TITLE">DW Tools</title>
 <link th:href="@{/webjars/bootstrap/3.2.0/css/bootstrap.min.css}" rel="stylesheet" />
 <link th:href="@{/css/layout.css}" rel="stylesheet" />
@@ -37,6 +38,6 @@
 
 <script th:src="@{/webjars/jquery/2.1.1/jquery.min.js}"></script>
 <script th:src="@{/webjars/bootstrap/3.2.0/js/bootstrap.min.js}"></script>
-<script layout:fragment="script"></script>
+<th:block layout:fragment="scripts"></th:block>
 </body>
 </html>

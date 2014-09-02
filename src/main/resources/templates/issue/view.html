@@ -133,7 +133,8 @@
 
 </div><!-- content -->
 
-<script type="text/javascript" th:inline="javascript" layout:fragment="script">
+<th:block layout:fragment="scripts">
+<script type="text/javascript" th:inline="javascript">
 var contextPath = [[${#httpServletRequest.contextPath}]];
 $(function() {
 
@@ -155,5 +156,6 @@ $(function() {
 
 });
 </script>
+</th:block>
 </body>
 </html>

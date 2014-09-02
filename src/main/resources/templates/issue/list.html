@@ -100,8 +100,10 @@
 
 </div><!-- content -->
 
-<script type="text/javascript">
-console.log('test');
+<th:block layout:fragment="scripts">
+<script type="text/javascript" th:inline="javascript">
+var contextPath = [[${#httpServletRequest.contextPath}]];
 </script>
+</th:block>
 </body>
 </html>
