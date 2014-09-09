@@ -1,5 +1,6 @@
 package com.anjuke.dw.tools.controller;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,13 +14,9 @@ import java.util.Set;
 import javax.validation.Valid;
 
 import org.json.JSONObject;
+import org.markdown4j.Markdown4jProcessor;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
-import org.pegdown.LinkRenderer;
-import org.pegdown.PegDownProcessor;
-import org.pegdown.ToHtmlSerializer;
-import org.pegdown.ast.CodeNode;
-import org.pegdown.ast.RootNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -91,19 +88,6 @@ public class IssueController {
                 + " dl dt dd kbd q samp var hr ruby rt rp li tr td th s strike"
             ).split(" "))
             .toFactory();
-
-   private class CustomToHtmlSerializer extends ToHtmlSerializer {
-
-        public CustomToHtmlSerializer() {
-            super(new LinkRenderer());
-        }
-
-        @Override
-        public void visit(CodeNode node) {
-            printer.print("<pre><code>" + node.getText().trim() + "</code></pre>");
-        }
-
-    }
 
     @RequestMapping({"", "list"})
     public String list(@ModelAttribute IssueFilterForm issueFilterForm, Model model) {
@@ -342,9 +326,13 @@ public class IssueController {
     }
 
     private String renderMarkdown(String input) {
-        PegDownProcessor peg = new PegDownProcessor();
-        RootNode astRoot = peg.parseMarkdown(input.toCharArray());
-        return sanitizer.sanitize(new CustomToHtmlSerializer().toHtml(astRoot));
+        String html;
+        try {
+            html = new Markdown4jProcessor().process(input);
+        } catch (IOException e) {
+            html = "<pre>" + input + "</pre>";
+        }
+        return sanitizer.sanitize(html);
     }
 
     @ModelAttribute("navbar")
