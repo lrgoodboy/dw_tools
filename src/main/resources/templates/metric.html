@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorator="layout">
+<head>
+<title>Metrics</title>
+<link th:href="@{/css/metric.css}" rel="stylesheet" />
+</head>
+<body>
+<div layout:fragment="content">
+
+<div class="row">
+  <div class="col-md-12">
+    <span class="subsite-title">Metrics</span>
+  </div>
+</div>
+
+<hr/>
+
+<div class="row">
+
+  <div class="col-md-3">
+  <table class="table">
+  <tr><td>VPPV</td><td class="data" id="tdVppv">-</td></tr>
+  <tr><td class="subitem">- 二手房</td><td class="data" id="tdEsfVppv">-</td></tr>
+  <tr><td class="subitem">- 新房</td><td class="data" id="tdNhVppv">-</td></tr>
+  <tr><td class="subitem">- 租房</td><td class="data" id="tdZfVppv">-</td></tr>
+  <tr><td class="subitem">- 商业地产</td><td class="data" id="tdSydcVppv">-</td></tr>
+  </table>
+  </div>
+
+</div><!-- row -->
+
+</div><!-- content -->
+
+<th:block layout:fragment="scripts">
+<script type="text/javascript" th:src="@{/js/metric.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+new Metric({
+    contextPath: [[${#httpServletRequest.contextPath}]]
+});
+</script>
+</th:block>
+</body>
+</html>
