@@ -14,14 +14,14 @@ Metric.prototype = {
         self.refresh();
         setInterval(function() {
             self.refresh();
-        }, 3000);
+        }, 4500);
     },
 
     refresh: function() {
         var self = this;
 
         var data = {
-            metricIds: '1,2,3,4,5'
+            metricIds: '1,2,3,4,5,6'
         };
 
         $.getJSON(self.contextPath + '/metric/get', data, function(result) {
@@ -30,6 +30,7 @@ Metric.prototype = {
             $('#tdNhVppv').text(result[3]);
             $('#tdZfVppv').text(result[4]);
             $('#tdSydcVppv').text(result[5]);
+            $('#tdUd').text(result[6]);
         });
     },
 
