@@ -7,6 +7,6 @@ import org.springframework.data.repository.CrudRepository;
 
 import com.anjuke.dw.tools.model.MetricLog;
 
-public interface MetricLogRepository extends CrudRepository<MetricLog, Long> {
+public interface MetricLogRepository extends CrudRepository<MetricLog, Long>, MetricLogRepositoryCustom {
     List<MetricLog> findByMetricIdOrderByCreatedDesc(long metricId, Pageable pageable);
 }

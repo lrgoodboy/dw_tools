@@ -17,6 +17,9 @@
 
 <hr/>
 
+<div class="row"><div class="col-md-12" id="udChart"></div></div>
+<div class="row"><div class="col-md-12" id="vppvChart"></div></div>
+
 <div class="row">
 
   <div class="col-md-3">
@@ -30,15 +33,19 @@
   </table>
   </div>
 
-</div><!-- row -->
+</div>
 
 </div><!-- content -->
 
 <th:block layout:fragment="scripts">
+<script type="text/javascript" th:src="@{/webjars/highcharts/4.0.3/highcharts.js}"></script>
 <script type="text/javascript" th:src="@{/js/metric.js}"></script>
 <script type="text/javascript" th:inline="javascript">
 new Metric({
-    contextPath: [[${#httpServletRequest.contextPath}]]
+    contextPath: [[${#httpServletRequest.contextPath}]],
+    beginTime: [[${beginTime}]],
+    endTime: [[${endTime}]],
+    udData: [[${udData}]]
 });
 </script>
 </th:block>
