@@ -89,20 +89,30 @@ Metric.prototype = {
                 }
             },
             series: [{
+                id: 'series-ud',
                 name: 'UD',
-                data: self.transformData(self.opts.udData)
+                data: self.opts.udData
             }]
         });
-    },
 
-    transformData: function(data) {
-        return $.map(data, function(log) {
-            return {
-                id: 'metricLog_' + log.id,
-                x: log.created.time,
-                y: log.data
-            };
-        });
+        setInterval(function() {
+
+            $.getJSON(self.contextPath + '/metric/get-latest', {metricId: 6}, function(result) {
+
+                var chart = $('#udChart').highcharts();
+
+                $.each(result, function() {
+                    var p = chart.get(this.id);
+                    if (p) {
+                        p.update(this.y);
+                    } else {
+                        chart.get('series-ud').addPoint(this);
+                    }
+                });
+
+            });
+
+        }, 5000);
     },
 
     _theEnd: undefined

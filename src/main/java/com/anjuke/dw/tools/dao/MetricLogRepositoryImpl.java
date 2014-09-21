@@ -1,5 +1,6 @@
 package com.anjuke.dw.tools.dao;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -10,7 +11,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import org.springframework.data.domain.Pageable;
+import org.apache.commons.lang.time.DateUtils;
 
 import com.anjuke.dw.tools.model.MetricLog;
 
@@ -20,7 +21,10 @@ public class MetricLogRepositoryImpl implements MetricLogRepositoryCustom {
     private EntityManager entityManager;
 
     @Override
-    public List<MetricLog> findRange(long metricId, Date begin, Date end, Pageable pageable) {
+    public List<MetricLog> findToday(long metricId, boolean asc, int limit) {
+
+        Date begin = DateUtils.truncate(new Date(), Calendar.DATE);
+        Date end = DateUtils.addSeconds(DateUtils.addDays(begin, 1), -1);
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<MetricLog> query = builder.createQuery(MetricLog.class);
@@ -32,11 +36,14 @@ public class MetricLogRepositoryImpl implements MetricLogRepositoryCustom {
             builder.lessThanOrEqualTo(metricLog.<Date>get("created"), end)
         );
 
-        query.orderBy(builder.asc(metricLog.get("created")));
+        if (asc) {
+            query.orderBy(builder.asc(metricLog.get("created")));
+        } else {
+            query.orderBy(builder.desc(metricLog.get("created")));
+        }
 
         TypedQuery<MetricLog> q = entityManager.createQuery(query);
-        q.setFirstResult(pageable.getOffset());
-        q.setMaxResults(pageable.getPageSize());
+        q.setMaxResults(limit);
 
         return q.getResultList();
     }
