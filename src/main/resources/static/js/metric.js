@@ -60,7 +60,7 @@ Metric.prototype = {
                     if (point) {
                         point.update(this.y);
                     } else {
-                        chart.series[0].addPoint(point);
+                        chart.series[0].addPoint(this);
                     }
 
                 });
