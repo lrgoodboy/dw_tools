@@ -49,11 +49,11 @@ Metric.prototype = {
             });
 
             // update charts
-            function updateChart(chartId, metricId) {
+            function updateChart(chartId, minMetric, winMetric) {
 
                 var chart = $('#' + chartId).highcharts();
 
-                $.each(result[metricId], function() {
+                $.each(result[minMetric], function() {
 
                     var point = chart.get(this.id);
 
@@ -65,14 +65,14 @@ Metric.prototype = {
 
                 });
 
-                $.each(result[metricId], function() {
+                $.each(result[winMetric], function() {
                     self.drawText(chart, chartId, this.y);
                 });
 
             }
 
-            updateChart('udChart', 6);
-            updateChart('vppvChart', 1);
+            updateChart('udChart', 16, 6);
+            updateChart('vppvChart', 11, 1);
         });
     },
 
