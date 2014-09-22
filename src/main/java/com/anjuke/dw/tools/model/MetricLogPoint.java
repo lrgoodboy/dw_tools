@@ -3,7 +3,7 @@ package com.anjuke.dw.tools.model;
 public class MetricLogPoint {
     private String id;
     private Long x;
-    private Long y;
+    private Long y = 0L;
     public String getId() {
         return id;
     }

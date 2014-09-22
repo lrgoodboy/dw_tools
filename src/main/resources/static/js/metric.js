@@ -13,7 +13,6 @@ Metric.prototype = {
     init: function() {
         var self = this;
 
-        self.refresh();
         setInterval(function() {
             self.refresh();
         }, 4500);
@@ -23,16 +22,57 @@ Metric.prototype = {
         var self = this;
 
         var data = {
-            metricIds: '1,2,3,4,5,6'
+            metricIds: '1,2,3,4,5,6,11,16',
+            limits: '1,1,1,1,1,1,5,5'
         };
 
-        $.getJSON(self.contextPath + '/metric/get', data, function(result) {
-            $('#tdVppv').text(result[1]);
-            $('#tdEsfVppv').text(result[2]);
-            $('#tdNhVppv').text(result[3]);
-            $('#tdZfVppv').text(result[4]);
-            $('#tdSydcVppv').text(result[5]);
-            $('#tdUd').text(result[6]);
+        $.getJSON(self.contextPath + '/metric/get-points', data, function(result) {
+
+            // update table
+            $.each(result[1], function() {
+                $('#tdVppv').text(this.y);
+            });
+            $.each(result[2], function() {
+                $('#tdEsfVppv').text(this.y);
+            });
+            $.each(result[3], function() {
+                $('#tdNhVppv').text(this.y);
+            });
+            $.each(result[4], function() {
+                $('#tdZfVppv').text(this.y);
+            });
+            $.each(result[5], function() {
+                $('#tdSydcVppv').text(this.y);
+            });
+            $.each(result[6], function() {
+                $('#tdUd').text(this.y);
+            });
+
+            // update charts
+            function updateChart(chartId, metricId) {
+
+                var chart = $('#' + chartId).highcharts();
+
+                $.each(result[metricId], function() {
+
+                    var point = chart.get(this.id);
+
+                    if (point) {
+                        point.update(this.y);
+                    } else {
+                        chart.series[0].addPoint(point);
+                    }
+
+                });
+
+                $.each(result[metricId], function() {
+                    self.drawText(chart, chartId, this.y);
+                });
+
+            }
+
+            updateChart('udChart', 16);
+            updateChart('vppvChart', 11);
         });
     },
 
@@ -45,15 +85,12 @@ Metric.prototype = {
             }
         });
 
-        $('#udChart').highcharts({
+        var template = {
             credits: {
                 enabled: false
             },
             chart: {
                 zoomType: 'x'
-            },
-            title: {
-                text: '移动App实时UD'
             },
             tooltip: {
                 xDateFormat: '%Y-%m-%d %H:%M'
@@ -88,45 +125,52 @@ Metric.prototype = {
                     }
                 }
             },
+
+        };
+
+        $('#udChart').highcharts($.extend({
+
+            title: {
+                text: '移动App实时UD'
+            },
             series: [{
                 name: 'UD',
                 data: self.opts.udData
             }]
 
-        }, function(chart) {
-
-            var text = null;
-            setInterval(function() {
-
-                $.getJSON(self.contextPath + '/metric/get-latest', {metricId: 16}, function(result) {
-
-                    $.each(result, function() {
-                        var p = chart.get(this.id);
-                        if (p) {
-                            p.update(this.y);
-                        } else {
-                            chart.series[0].addPoint(this);
-                        }
-                    });
-
-                });
-
-                $.getJSON(self.contextPath + '/metric/get', {metricIds: '6'}, function(result) {
-
-                    if (text != null) {
-                        text.destroy();
-                    }
-
-                    text = chart.renderer.text(
-                            '<span style="font-size: 16px; font-weight: bold;">' + result[6] + '/min</span>',
-                            chart.chartWidth - 120, 25);
-                    text.add();
-                });
-
-            }, 5000);
-
+        }, template), function(chart) {
+            self.drawText(chart, 'udChart', self.opts.udWindow);
         });
 
+        $('#vppvChart').highcharts($.extend({
+
+            title: {
+                text: '移动App实时VPPV'
+            },
+            series: [{
+                name: 'VPPV',
+                data: self.opts.vppvData
+            }]
+
+        }, template), function(chart) {
+            self.drawText(chart, 'vppvChart', self.opts.vppvWindow);
+        });
+
+    },
+
+    texts: {},
+    drawText: function(chart, name, data) {
+        var self = this;
+
+        if (self.texts[name]) {
+            self.texts[name].destroy();
+        }
+
+        self.texts[name] = chart.renderer.text(
+                '<span style="font-size: 16px; font-weight: bold;">' + data + '/min</span>',
+                chart.chartWidth - 120, 25);
+
+        self.texts[name].add();
     },
 
     _theEnd: undefined

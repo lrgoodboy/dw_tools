@@ -17,19 +17,20 @@
 
 <hr/>
 
-<div class="row"><div class="col-md-12" id="udChart"></div></div>
-<div class="row"><div class="col-md-12" id="vppvChart"></div></div>
+<div class="row" style="margin-bottom: 20px;"><div class="col-md-12" id="udChart"></div></div>
+<div class="row" style="margin-bottom: 20px;"><div class="col-md-12" id="vppvChart"></div></div>
 
 <div class="row">
 
-  <div class="col-md-3">
+  <div class="col-md-4 col-md-offset-4">
+  <div style="text-align:center; font-size: 18px; margin-bottom: 15px;">移动App实时VPPV明细</div>
   <table class="table">
-  <tr><td>UD</td><td class="data" id="tdUd">-</td></tr>
-  <tr><td>VPPV</td><td class="data" id="tdVppv">-</td></tr>
-  <tr><td class="subitem">- 二手房</td><td class="data" id="tdEsfVppv">-</td></tr>
-  <tr><td class="subitem">- 新房</td><td class="data" id="tdNhVppv">-</td></tr>
-  <tr><td class="subitem">- 租房</td><td class="data" id="tdZfVppv">-</td></tr>
-  <tr><td class="subitem">- 商业地产</td><td class="data" id="tdSydcVppv">-</td></tr>
+  <tr><td>UD</td><td class="data" id="tdUd" th:text="${udWindow}"></td></tr>
+  <tr><td>VPPV</td><td class="data" id="tdVppv" th:text="${vppvWindow}"></td></tr>
+  <tr><td class="subitem">- 二手房</td><td class="data" id="tdEsfVppv" th:text="${vppvEsfWindow}"></td></tr>
+  <tr><td class="subitem">- 新房</td><td class="data" id="tdNhVppv" th:text="${vppvNhWindow}"></td></tr>
+  <tr><td class="subitem">- 租房</td><td class="data" id="tdZfVppv" th:text="${vppvZfWindow}"></td></tr>
+  <tr><td class="subitem">- 商业地产</td><td class="data" id="tdSydcVppv" th:text="${vppvSydcWindow}"></td></tr>
   </table>
   </div>
 
@@ -45,7 +46,10 @@ new Metric({
     contextPath: [[${#httpServletRequest.contextPath}]],
     beginTime: [[${beginTime}]],
     endTime: [[${endTime}]],
-    udData: [[${udData}]]
+    udData: [[${udData}]],
+    udWindow: [[${udWindow}]],
+    vppvData: [[${vppvData}]],
+    vppvWindow: [[${vppvWindow}]]
 });
 </script>
 </th:block>

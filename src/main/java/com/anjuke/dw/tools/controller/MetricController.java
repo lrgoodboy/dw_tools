@@ -26,6 +26,7 @@ import com.anjuke.dw.tools.model.MetricLogPoint;
 @Controller
 @RequestMapping("/metric")
 public class MetricController {
+
     @Autowired
     private MetricLogRepository metricLogRepository;
 
@@ -36,18 +37,36 @@ public class MetricController {
         Date end = DateUtils.addSeconds(DateUtils.addDays(begin, 1), -1);
 
         List<MetricLogPoint> udData = log2point(16, metricLogRepository.findToday(16, true, 1440));
+        String udWindow = getWindow(6);
+
+        List<MetricLogPoint> vppvData = log2point(11, metricLogRepository.findToday(11, true, 1440));
+        String vppvWindow = getWindow(1);
+
+        String vppvEsfWindow = getWindow(2);
+        String vppvNhWindow = getWindow(3);
+        String vppvZfWindow = getWindow(4);
+        String vppvSydcWindow = getWindow(5);
 
         model.addAttribute("beginTime", begin.getTime());
         model.addAttribute("endTime", end.getTime());
         model.addAttribute("udData", udData);
+        model.addAttribute("udWindow", udWindow);
+        model.addAttribute("vppvData", vppvData);
+        model.addAttribute("vppvWindow", vppvWindow);
+        model.addAttribute("vppvEsfWindow", vppvEsfWindow);
+        model.addAttribute("vppvNhWindow", vppvNhWindow);
+        model.addAttribute("vppvZfWindow", vppvZfWindow);
+        model.addAttribute("vppvSydcWindow", vppvSydcWindow);
 
         return "metric";
     }
 
-    @RequestMapping("get-latest")
-    @ResponseBody
-    public List<MetricLogPoint> getLatest(@RequestParam long metricId) {
-        return log2point(metricId, metricLogRepository.findToday(metricId, false, 5));
+    private String getWindow(long metricId) {
+        List<MetricLog> logs = metricLogRepository.findToday(metricId, false, 1);
+        if (logs.isEmpty()) {
+            return "-";
+        }
+        return logs.get(0).getData().toString();
     }
 
     private List<MetricLogPoint> log2point(long metricId, List<MetricLog> logs) {
@@ -66,29 +85,35 @@ public class MetricController {
         return points;
     }
 
-    @RequestMapping("get")
+    @RequestMapping("get-points")
     @ResponseBody
-    public Map<Long, Long> get(@RequestParam String metricIds) {
+    public Map<Long, List<MetricLogPoint>> getPoints(@RequestParam String metricIds, @RequestParam String limits) {
 
-        Map<Long, Long> metricData = new HashMap<Long, Long>();
+        Map<Long, List<MetricLogPoint>> result = new HashMap<Long, List<MetricLogPoint>>();
 
-        for (String metricIdString : metricIds.split(",")) {
+        String[] metricIdArray = metricIds.split(",");
+        String[] limitArray = limits.split(",");
+        for (int i = 0; i < metricIdArray.length; ++i) {
+
+            if (i > limitArray.length - 1) {
+                break;
+            }
+
             long metricId;
+            int limit;
             try {
-                metricId = Long.parseLong(metricIdString);
+                metricId = Long.parseLong(metricIdArray[i]);
+                limit = Integer.parseInt(limitArray[i]);
             } catch (NumberFormatException e) {
                 continue;
             }
 
-            List<MetricLog> metricLogs = metricLogRepository.findByMetricIdOrderByCreatedDesc(metricId, new PageRequest(0, 1));
-            if (metricLogs.isEmpty()) {
-                continue;
-            }
-            MetricLog metricLog = metricLogs.get(0);
-            metricData.put(metricLog.getMetricId(), metricLog.getData());
+            List<MetricLog> logs = metricLogRepository.findByMetricIdOrderByCreatedDesc(metricId, new PageRequest(0, limit));
+            result.put(metricId, log2point(metricId, logs));
+
         }
 
-        return metricData;
+        return result;
     }
 
     @ModelAttribute("navbar")
