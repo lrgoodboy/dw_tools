@@ -71,8 +71,8 @@ Metric.prototype = {
 
             }
 
-            updateChart('udChart', 16);
-            updateChart('vppvChart', 11);
+            updateChart('udChart', 6);
+            updateChart('vppvChart', 1);
         });
     },
 
