@@ -25,6 +25,7 @@
       <ul class="nav navbar-nav">
         <li th:class="${navbar} == 'ppp' ? active"><a href="#">PPP</a></li>
         <li th:class="${navbar} == 'issue' ? active"><a th:href="@{/issue}">Issues</a></li>
+        <li th:class="${navbar} == 'metric' ? active"><a th:href="@{/metric}">Metrics</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a href="#" th:text="${session.user.truename}"></a></li>
