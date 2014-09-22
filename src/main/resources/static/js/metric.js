@@ -95,9 +95,10 @@ Metric.prototype = {
 
         }, function(chart) {
 
+            var text = null;
             setInterval(function() {
 
-                $.getJSON(self.contextPath + '/metric/get-latest', {metricId: 6}, function(result) {
+                $.getJSON(self.contextPath + '/metric/get-latest', {metricId: 16}, function(result) {
 
                     $.each(result, function() {
                         var p = chart.get(this.id);
@@ -110,12 +111,20 @@ Metric.prototype = {
 
                 });
 
+                $.getJSON(self.contextPath + '/metric/get', {metricIds: '6'}, function(result) {
+
+                    if (text != null) {
+                        text.destroy();
+                    }
+
+                    text = chart.renderer.text(
+                            '<span style="font-size: 16px; font-weight: bold;">' + result[6] + '/min</span>',
+                            chart.chartWidth - 120, 25);
+                    text.add();
+                });
+
             }, 5000);
 
-            var text = chart.renderer.text(
-                    '<span style="font-size: 16px; font-weight: bold;">123/min</span>',
-                    chart.chartWidth - 100, 80);
-            text.add();
         });
 
     },

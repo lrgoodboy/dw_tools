@@ -35,7 +35,7 @@ public class MetricController {
         Date begin = DateUtils.truncate(new Date(), Calendar.DATE);
         Date end = DateUtils.addSeconds(DateUtils.addDays(begin, 1), -1);
 
-        List<MetricLogPoint> udData = log2point(6, metricLogRepository.findToday(6, true, 1440));
+        List<MetricLogPoint> udData = log2point(16, metricLogRepository.findToday(16, true, 1440));
 
         model.addAttribute("beginTime", begin.getTime());
         model.addAttribute("endTime", end.getTime());
