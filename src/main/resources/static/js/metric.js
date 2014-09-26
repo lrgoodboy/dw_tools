@@ -123,6 +123,9 @@ Metric.prototype = {
                     marker: {
                         enabled: false,
                     }
+                },
+                series: {
+                    turboThreshold: 1440
                 }
             },
 
@@ -149,7 +152,6 @@ Metric.prototype = {
             },
             series: [{
                 name: 'VPPV',
-                turboThreshold: 1440,
                 data: self.opts.vppvData
             }]
 
