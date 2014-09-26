@@ -149,6 +149,7 @@ Metric.prototype = {
             },
             series: [{
                 name: 'VPPV',
+                turboThreshold: 1440,
                 data: self.opts.vppvData
             }]
 
