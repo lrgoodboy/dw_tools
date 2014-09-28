@@ -15,14 +15,14 @@ Metric.prototype = {
 
         setInterval(function() {
             self.refresh();
-        }, 4500);
+        }, 2500);
     },
 
     refresh: function() {
         var self = this;
 
         var data = {
-            metricIds: '1,2,3,4,5,6,11,16',
+            metricIds: '1,2,3,4,5,6,11,26',
             limits: '1,1,1,1,1,1,5,5'
         };
 
