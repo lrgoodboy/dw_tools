@@ -11,7 +11,6 @@ import java.util.Map;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -36,7 +35,7 @@ public class MetricController {
         Date begin = DateUtils.truncate(new Date(), Calendar.DATE);
         Date end = DateUtils.addSeconds(DateUtils.addDays(begin, 1), -1);
 
-        List<MetricLogPoint> udData = log2point(16, metricLogRepository.findToday(16, true, 1440));
+        List<MetricLogPoint> udData = log2point(26, metricLogRepository.findToday(26, true, 1440));
         String udWindow = getWindow(6);
 
         List<MetricLogPoint> vppvData = log2point(11, metricLogRepository.findToday(11, true, 1440));
@@ -108,7 +107,7 @@ public class MetricController {
                 continue;
             }
 
-            List<MetricLog> logs = metricLogRepository.findByMetricIdOrderByCreatedDesc(metricId, new PageRequest(0, limit));
+            List<MetricLog> logs = metricLogRepository.findLatest(metricId, limit);
             result.put(metricId, log2point(metricId, logs));
 
         }
