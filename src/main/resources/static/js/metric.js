@@ -137,6 +137,7 @@ Metric.prototype = {
                 text: '移动App实时UD'
             },
             series: [{
+                type: 'spline',
                 name: 'UD',
                 data: self.opts.udData
             }]
