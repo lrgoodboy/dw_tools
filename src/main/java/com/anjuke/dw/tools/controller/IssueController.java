@@ -56,6 +56,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @SessionAttributes("user")
 public class IssueController {
 
+    @SuppressWarnings("unused")
     private Logger logger = LoggerFactory.getLogger(IssueController.class);
 
     @Autowired
@@ -169,6 +170,8 @@ public class IssueController {
             @ModelAttribute IssueReplyForm issueReplyForm,
             BindingResult result, Model model) {
 
+        boolean needBuild = false;
+
         do {
 
             if (result.hasErrors()) {
@@ -196,7 +199,7 @@ public class IssueController {
                 }
 
                 issueActionRepository.save(action);
-                issueService.buildAsync(issue.getId());
+                needBuild = true;
 
                 sendEmail(String.format("Re: Issue#%d %s", issue.getId(), issue.getTitle()), issueReplyForm.getContent(),
                         currentUser.getTruename(), action.getCreated(), action.getIssueId());
@@ -232,6 +235,10 @@ public class IssueController {
             issueReplyForm.setContent(null);
 
         } while (false);
+
+        if (needBuild) {
+            issueService.buildAsync(issue.getId());
+        }
 
         renderIssueView(issue, model, currentUser);
         return "issue/view";
