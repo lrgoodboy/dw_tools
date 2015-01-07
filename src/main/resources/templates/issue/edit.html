@@ -27,13 +27,13 @@
         <ul class="nav nav-tabs">
           <li class="active"><a href="#tabEdit" data-toggle="tab">编辑</a></li>
           <li><a href="#tabPreview" data-toggle="tab" id="btnPreview">预览</a></li>
+          <li class="pull-right"><a href="javascript:void(0)" id="btnUpload">上传图片</a></li>
         </ul>
       </div>
       <div class="tab-content">
         <div class="tab-pane active" id="tabEdit">
           <div class="form-group" th:classappend="${#fields.hasErrors('content')} ? has-error">
             <textarea class="form-control" rows="15" th:field="*{content}" id="txtContent"></textarea>
-            <div id="btnUpload">上传文件</div>
           </div>
         </div>
         <div class="tab-pane" id="tabPreview"></div>

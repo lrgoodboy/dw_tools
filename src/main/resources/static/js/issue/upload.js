@@ -15,7 +15,30 @@ IssueUpload.prototype = {
         });
 
         $('#fileUpload').change(function() {
-            alert($(this).val());
+            if ($(this).val()) {
+                $('#frmUpload').submit();
+            }
+        });
+
+        $('#ifrmUpload').load(function() {
+
+            var data = $(this).contents().text();
+            if (!data) {
+                return;
+            }
+
+            data = $.parseJSON(data);
+            if (data.status == 'err') {
+                alert('上传失败 - ' + data.error);
+                return;
+            } else if (data.status != 'ok') {
+                return;
+            }
+
+            var imageUrl = 'http://picN.ajkimg.com/display/origin/'.replace(/picN/, 'pic' + data.image.host)
+                         + data.image.id + '.jpg';
+            var container = $('#' + self.opts.containerId);
+            container.val(container.val() + '![](' + imageUrl + ')');
         });
     },
 
