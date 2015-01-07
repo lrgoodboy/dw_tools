@@ -274,6 +274,12 @@ public class IssueController {
         return renderMarkdown(content);
     }
 
+    @RequestMapping(value = "upload-callback")
+    @ResponseBody
+    public String uploadCallback(@RequestParam("q") String q) {
+        return q;
+    }
+
     private void renderIssueView(Issue issue, Model model, User currentUser) {
 
         Set<Long> userIds = new HashSet<Long>();

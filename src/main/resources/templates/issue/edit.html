@@ -32,7 +32,8 @@
       <div class="tab-content">
         <div class="tab-pane active" id="tabEdit">
           <div class="form-group" th:classappend="${#fields.hasErrors('content')} ? has-error">
-            <textarea class="form-control" rows="15" th:field="*{content}"></textarea>
+            <textarea class="form-control" rows="15" th:field="*{content}" id="txtContent"></textarea>
+            <div id="btnUpload">上传文件</div>
           </div>
         </div>
         <div class="tab-pane" id="tabPreview"></div>
@@ -44,13 +45,20 @@
   </div>
 </div>
 
+<div th:replace="issue/upload::upload"></div>
+
 </div>
 
 <th:block layout:fragment="scripts">
 <script type="text/javascript" th:src="@{/js/issue/edit.js}"></script>
+<script type="text/javascript" th:src="@{/js/issue/upload.js}"></script>
 <script type="text/javascript" th:inline="javascript">
 new IssueEdit({
     contextPath: [[${#httpServletRequest.contextPath}]]
+});
+new IssueUpload({
+    buttonId: 'btnUpload',
+    containerId: 'txtContent'
 });
 </script>
 </th:block>
