@@ -1,6 +1,9 @@
 var IssueUpload = function(opts) {
     var self = this;
-    self.opts = opts;
+    self.opts = $.extend({
+        buttonId: 'btnUpload',
+        containerId: 'txtContent'
+    }, opts);
     self.init();
 };
 
@@ -35,7 +38,7 @@ IssueUpload.prototype = {
                 return;
             }
 
-            var imageUrl = 'http://picN.ajkimg.com/display/origin/'.replace(/picN/, 'pic' + data.image.host)
+            var imageUrl = $('#frmUpload').attr('data-ais-display').replace(/picN/, 'pic' + data.image.host)
                          + data.image.id + '.jpg';
             var container = $('#' + self.opts.containerId);
             container.val(container.val() + '![](' + imageUrl + ')');

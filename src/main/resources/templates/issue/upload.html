@@ -3,7 +3,8 @@
 <body>
 <div th:fragment="upload" style="display: none;">
 
-<form action="http://upd1.ajkimg.com/upload?rt=http://127.0.0.1:8913/tools/issue/upload-callback" method="post" id="frmUpload" target="ifrmUpload" enctype="multipart/form-data">
+<form th:action="${aisUpload} + '?rt=' + ${aisCallback}" th:attr="data-ais-display=${aisDisplay}"
+    method="post" id="frmUpload" target="ifrmUpload" enctype="multipart/form-data">
   <input type="file" name="file" id="fileUpload" />
   <iframe name="ifrmUpload" id="ifrmUpload"></iframe>
 </form>

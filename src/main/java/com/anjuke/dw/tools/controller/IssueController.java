@@ -77,6 +77,13 @@ public class IssueController {
     @Value("${email.baseurl}")
     private String emailBaseUrl;
 
+    @Value("${ais.upload}")
+    private String aisUpload;
+    @Value("${ais.callback}")
+    private String aisCallback;
+    @Value("${ais.display}")
+    private String aisDisplay;
+
     // https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/sanitization_filter.rb
     private PolicyFactory sanitizer = new HtmlPolicyBuilder()
             .allowAttributes("src").onElements("img")
@@ -351,6 +358,13 @@ public class IssueController {
     @ModelAttribute("navbar")
     public String getNavBar() {
         return "issue";
+    }
+
+    @ModelAttribute
+    private void setAisInfo(Model model) {
+        model.addAttribute("aisUpload", aisUpload);
+        model.addAttribute("aisCallback", aisCallback);
+        model.addAttribute("aisDisplay", aisDisplay);
     }
 
 }
