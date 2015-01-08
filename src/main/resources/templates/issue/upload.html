@@ -3,7 +3,7 @@
 <body>
 <div th:fragment="upload" style="display: none;">
 
-<form th:action="${aisUpload} + '?rt=' + ${aisCallback}" th:attr="data-ais-display=${aisDisplay}"
+<form th:action="${aisProperties.upload} + '?rt=' + ${aisProperties.callback}" th:attr="data-ais-display=${aisProperties.display}"
     method="post" id="frmUpload" target="ifrmUpload" enctype="multipart/form-data">
   <input type="file" name="file" id="fileUpload" />
   <iframe name="ifrmUpload" id="ifrmUpload"></iframe>

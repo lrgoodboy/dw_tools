@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import com.anjuke.dw.tools.AisProperties;
 import com.anjuke.dw.tools.dao.IssueActionRepository;
 import com.anjuke.dw.tools.dao.IssueRepository;
 import com.anjuke.dw.tools.dao.UserRepository;
@@ -77,12 +78,8 @@ public class IssueController {
     @Value("${email.baseurl}")
     private String emailBaseUrl;
 
-    @Value("${ais.upload}")
-    private String aisUpload;
-    @Value("${ais.callback}")
-    private String aisCallback;
-    @Value("${ais.display}")
-    private String aisDisplay;
+    @Autowired
+    private AisProperties aisProperties;
 
     // https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/sanitization_filter.rb
     private PolicyFactory sanitizer = new HtmlPolicyBuilder()
@@ -361,10 +358,8 @@ public class IssueController {
     }
 
     @ModelAttribute
-    private void setAisInfo(Model model) {
-        model.addAttribute("aisUpload", aisUpload);
-        model.addAttribute("aisCallback", aisCallback);
-        model.addAttribute("aisDisplay", aisDisplay);
+    public AisProperties getAisProperties() {
+        return aisProperties;
     }
 
 }
