@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.NameValuePair;
@@ -27,12 +28,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.RedirectView;
@@ -43,7 +42,6 @@ import com.anjuke.dw.tools.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
-@SessionAttributes("user")
 public class LoginController {
 
     private static final String DEFAULT_FROM = "/";
@@ -71,7 +69,7 @@ public class LoginController {
             @RequestParam(value = "access_token", required = false) String accessToken,
             @RequestParam(value = "from", defaultValue = DEFAULT_FROM) String from,
             @RequestParam(value = "custom", defaultValue = DEFAULT_FROM) String custom,
-            Model model, HttpServletResponse response) throws Exception {
+            HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         User user = null;
 
@@ -85,7 +83,7 @@ public class LoginController {
 
             if (user != null) {
                 logger.info("Login by cookie: " + user.getUsername());
-                model.addAttribute("user", user);
+                request.getSession().setAttribute("user", user);
                 return redirect(from);
             }
         }
@@ -99,7 +97,7 @@ public class LoginController {
 
             if (user != null) {
                 logger.info("Login by auth: " + user.getUsername());
-                model.addAttribute("user", user);
+                request.getSession().setAttribute("user", user);
 
                 Cookie cookie = new Cookie(COOKIE_NAME, getCookieToken(user.getId()));
                 cookie.setMaxAge(COOKIE_EXPIRE);
@@ -125,7 +123,6 @@ public class LoginController {
     private RedirectView redirect(String url) {
         RedirectView redirect = new RedirectView();
         redirect.setStatusCode(HttpStatus.FOUND);
-        redirect.setExposeModelAttributes(false);
         redirect.setUrl(url);
         logger.info("Redirect: " + url);
         return redirect;

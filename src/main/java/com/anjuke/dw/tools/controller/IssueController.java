@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import com.anjuke.dw.tools.AisProperties;
 import com.anjuke.dw.tools.dao.IssueActionRepository;
 import com.anjuke.dw.tools.dao.IssueRepository;
 import com.anjuke.dw.tools.dao.UserRepository;
@@ -76,6 +77,9 @@ public class IssueController {
     private String emailReceiver;
     @Value("${email.baseurl}")
     private String emailBaseUrl;
+
+    @Autowired
+    private AisProperties aisProperties;
 
     // https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/sanitization_filter.rb
     private PolicyFactory sanitizer = new HtmlPolicyBuilder()
@@ -274,6 +278,12 @@ public class IssueController {
         return renderMarkdown(content);
     }
 
+    @RequestMapping(value = "upload-callback")
+    @ResponseBody
+    public String uploadCallback(@RequestParam("q") String q) {
+        return q;
+    }
+
     private void renderIssueView(Issue issue, Model model, User currentUser) {
 
         Set<Long> userIds = new HashSet<Long>();
@@ -345,6 +355,11 @@ public class IssueController {
     @ModelAttribute("navbar")
     public String getNavBar() {
         return "issue";
+    }
+
+    @ModelAttribute
+    public AisProperties getAisProperties() {
+        return aisProperties;
     }
 
 }

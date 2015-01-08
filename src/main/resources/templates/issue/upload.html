@@ -1,0 +1,14 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<body>
+<div th:fragment="upload" style="display: none;">
+
+<form th:action="${aisProperties.upload} + '?rt=' + ${aisProperties.callback}" th:attr="data-ais-display=${aisProperties.display}"
+    method="post" id="frmUpload" target="ifrmUpload" enctype="multipart/form-data">
+  <input type="file" name="file" id="fileUpload" />
+  <iframe name="ifrmUpload" id="ifrmUpload"></iframe>
+</form>
+
+</div>
+</body>
+</html>
