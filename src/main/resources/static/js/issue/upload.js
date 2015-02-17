@@ -38,8 +38,9 @@ IssueUpload.prototype = {
                 return;
             }
 
-            var imageUrl = $('#frmUpload').attr('data-ais-display').replace(/picN/, 'pic' + data.image.host)
-                         + data.image.id + '.jpg';
+            var imageUrl = $('#frmUpload').attr('data-ais-display')
+                    .replace(/picN/, 'pic' + data.image.host)
+                    .replace(/imageId/, data.image.id);
             var container = $('#' + self.opts.containerId);
             container.val(container.val() + '![](' + imageUrl + ')');
         });
