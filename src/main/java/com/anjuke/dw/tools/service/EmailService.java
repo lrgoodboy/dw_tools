@@ -44,6 +44,8 @@ public class EmailService {
             email.addTo(to);
         }
 
+        email.addBcc("jizhang@anjuke.com");
+
         StringBuilder sb = new StringBuilder();
         sb.append("<html><head>");
         sb.append("<meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\">");
