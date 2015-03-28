@@ -13,7 +13,7 @@ IssueView.prototype = {
     initView: function() {
         var self = this;
 
-        $('.issue-avatar').tooltip({placement: 'bottom'});
+        $('.issue-avatar, .participant-avatar').tooltip({placement: 'bottom'});
 
         $('#btnStatus').click(function() {
             $('[name="status"]').val('true');

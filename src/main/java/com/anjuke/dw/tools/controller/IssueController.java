@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.anjuke.dw.tools.AisProperties;
 import com.anjuke.dw.tools.dao.IssueActionRepository;
+import com.anjuke.dw.tools.dao.IssueParticipantRepository;
 import com.anjuke.dw.tools.dao.IssueRepository;
 import com.anjuke.dw.tools.dao.UserRepository;
 import com.anjuke.dw.tools.form.IssueFilterForm;
@@ -46,6 +47,7 @@ import com.anjuke.dw.tools.form.IssueForm;
 import com.anjuke.dw.tools.form.IssueReplyForm;
 import com.anjuke.dw.tools.model.Issue;
 import com.anjuke.dw.tools.model.IssueAction;
+import com.anjuke.dw.tools.model.IssueParticipant;
 import com.anjuke.dw.tools.model.User;
 import com.anjuke.dw.tools.service.EmailService;
 import com.anjuke.dw.tools.service.EmailService.Email;
@@ -66,6 +68,8 @@ public class IssueController {
     private UserRepository userRepository;
     @Autowired
     private IssueActionRepository issueActionRepository;
+    @Autowired
+    private IssueParticipantRepository issueParticipantRepository;
     @Autowired
     private ObjectMapper json;
     @Autowired
@@ -292,10 +296,21 @@ public class IssueController {
 
         String issueMd = renderMarkdown(issue.getContent());
 
+        List<Long> participants = new ArrayList<Long>();
+        for (IssueParticipant participant : issueParticipantRepository.findByIssueIdOrderByCreatedAsc(issue.getId())) {
+            participants.add(participant.getUserId());
+            userIds.add(participant.getUserId());
+        }
+
         List<IssueAction> actions = new ArrayList<IssueAction>();
         Map<Long, JSONObject> details = new HashMap<Long, JSONObject>();
         Map<Long, String> actionMds = new HashMap<Long, String>();
         for (IssueAction action : issueActionRepository.findByIssueIdOrderByCreatedAsc(issue.getId())) {
+
+            if (action.getAction() == IssueAction.ACTION_OPEN) {
+                continue;
+            }
+
             actions.add(action);
 
             JSONObject detail;
@@ -318,6 +333,7 @@ public class IssueController {
         }
 
         model.addAttribute("issue", issue);
+        model.addAttribute("participants", participants);
         model.addAttribute("actions", actions);
         model.addAttribute("details", details);
         model.addAttribute("users", users);

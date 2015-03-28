@@ -41,18 +41,20 @@
         <span th:text="${#dates.format(issue.created, 'yyyy-MM-dd HH:mm:ss')}"></span>
       </div>
     </div>
+
+    <ul class="participant-list">
+      <li><span class="text-muted"><span class="glyphicon glyphicon-user"></span> 参与者</span></li>
+      <li th:each="participant : ${participants}">
+        <a href="#" class="participant-avatar" data-toggle="tooltip" th:title="${users.get(participant).truename}">
+          <img th:src="@{http://gravatar.com/avatar/{hash}?s=20(hash=${hashes.get(participant)})}" />
+        </a>
+      </li>
+    </ul>
+
   </div>
 </div>
 
 <div class="row action-row" th:each="action : ${actions}">
-  <div class="col-md-11 col-md-offset-1" th:if="${action.action} == ${action.ACTION_OPEN}">
-    <div class="action-noreply">
-      <span class="text-warning"><span class="glyphicon glyphicon-edit"></span> 创建</span>
-      <img th:src="@{http://gravatar.com/avatar/{hash}?s=20(hash=${hashes[action.operatorId]})}" />
-      <a href="#" th:text="${users[action.operatorId].truename}"></a>
-      <span th:text="${#dates.format(action.created, 'yyyy-MM-dd HH:mm:ss')}" class="text-muted"></span>
-    </div>
-  </div>
   <div class="col-md-11 col-md-offset-1" th:if="${action.action} == ${action.ACTION_CLOSE}">
     <div class="action-noreply">
       <span class="text-success"><span class="glyphicon glyphicon-check"></span> 已关闭</span>
@@ -74,7 +76,7 @@
       <img th:src="@{http://gravatar.com/avatar/{hash}?s=60(hash=${hashes[action.operatorId]})}" class="img-rounded" />
     </a>
   </div>
-  <div class="col-md-11" th:if="${action.action} == 4">
+  <div class="col-md-11" th:if="${action.action} == ${action.ACTION_REPLY}">
     <div class="issue-item action-item">
       <div th:utext="${actionMds[action.id]}" class="issue-content"></div>
       <div class="issue-footer text-muted">
