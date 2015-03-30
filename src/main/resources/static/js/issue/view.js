@@ -1,6 +1,7 @@
 var IssueView = function(opts) {
     var self = this;
     self.contextPath = opts.contextPath;
+    self.opts = opts;
     $(function() {
         self.initView();
         self.initReply();
@@ -13,7 +14,7 @@ IssueView.prototype = {
     initView: function() {
         var self = this;
 
-        $('.issue-avatar').tooltip({placement: 'bottom'});
+        $('.issue-avatar, .participant-avatar').tooltip({placement: 'bottom'});
 
         $('#btnStatus').click(function() {
             $('[name="status"]').val('true');
@@ -45,6 +46,12 @@ IssueView.prototype = {
                 $('#tabPreview').html(result);
             });
         });
+
+        $('[name="content"]').atwho({
+            at: '@',
+            data: self.opts.atData
+        });
+
     },
 
     _theEnd: undefined

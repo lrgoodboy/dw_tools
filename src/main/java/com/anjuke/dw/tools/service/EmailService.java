@@ -1,5 +1,6 @@
 package com.anjuke.dw.tools.service;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -40,11 +41,13 @@ public class EmailService {
         email.setFrom(emailUsername, em.getSender());
         email.setSubject(em.getSubject());
 
-        for (String to : em.getReceivers()) {
-            email.addTo(to);
+        for (EmailReceiver to : em.getTo()) {
+            email.addTo(to.getEmail(), to.getName());
         }
 
-        email.addBcc("jizhang@anjuke.com");
+        for (EmailReceiver cc : em.getCc()) {
+            email.addCc(cc.getEmail(), cc.getName());
+        }
 
         StringBuilder sb = new StringBuilder();
         sb.append("<html><head>");
@@ -55,8 +58,10 @@ public class EmailService {
         email.setHtmlMsg(sb.toString());
         email.setCharset("UTF-8");
 
-        logger.info(String.format("Sending email, subject: %s, sender: %s, receivers: %s",
-                em.getSubject(), em.getSender(), Iterables.toString(em.getReceivers())));
+        logger.info(String.format("Sending email, subject: %s, sender: %s, to: %s, cc: %s",
+                em.getSubject(), em.getSender(),
+                Iterables.toString(email.getToAddresses()),
+                Iterables.toString(email.getCcAddresses())));
 
         email.send();
     }
@@ -84,11 +89,29 @@ public class EmailService {
 
     }
 
+    public static class EmailReceiver {
+        private String email;
+        private String name;
+        public String getEmail() {
+            return email;
+        }
+        public void setEmail(String email) {
+            this.email = email;
+        }
+        public String getName() {
+            return name;
+        }
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
     public static class Email {
         private String subject;
         private String html;
         private String sender;
-        private Iterable<String> receivers;
+        private List<EmailReceiver> to;
+        private List<EmailReceiver> cc;
         public String getSubject() {
             return subject;
         }
@@ -107,11 +130,17 @@ public class EmailService {
         public void setSender(String sender) {
             this.sender = sender;
         }
-        public Iterable<String> getReceivers() {
-            return receivers;
+        public List<EmailReceiver> getTo() {
+            return to;
         }
-        public void setReceivers(Iterable<String> receivers) {
-            this.receivers = receivers;
+        public void setTo(List<EmailReceiver> to) {
+            this.to = to;
+        }
+        public List<EmailReceiver> getCc() {
+            return cc;
+        }
+        public void setCc(List<EmailReceiver> cc) {
+            this.cc = cc;
         }
     }
 

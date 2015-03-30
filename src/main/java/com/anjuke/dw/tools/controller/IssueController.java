@@ -3,7 +3,6 @@ package com.anjuke.dw.tools.controller;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,6 +38,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.anjuke.dw.tools.AisProperties;
 import com.anjuke.dw.tools.dao.IssueActionRepository;
+import com.anjuke.dw.tools.dao.IssueParticipantRepository;
 import com.anjuke.dw.tools.dao.IssueRepository;
 import com.anjuke.dw.tools.dao.UserRepository;
 import com.anjuke.dw.tools.form.IssueFilterForm;
@@ -46,10 +46,13 @@ import com.anjuke.dw.tools.form.IssueForm;
 import com.anjuke.dw.tools.form.IssueReplyForm;
 import com.anjuke.dw.tools.model.Issue;
 import com.anjuke.dw.tools.model.IssueAction;
+import com.anjuke.dw.tools.model.IssueParticipant;
 import com.anjuke.dw.tools.model.User;
 import com.anjuke.dw.tools.service.EmailService;
 import com.anjuke.dw.tools.service.EmailService.Email;
+import com.anjuke.dw.tools.service.EmailService.EmailReceiver;
 import com.anjuke.dw.tools.service.IssueService;
+import com.anjuke.dw.tools.service.IssueService.ParticipantInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
@@ -57,7 +60,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @SessionAttributes("user")
 public class IssueController {
 
-    @SuppressWarnings("unused")
     private Logger logger = LoggerFactory.getLogger(IssueController.class);
 
     @Autowired
@@ -67,14 +69,14 @@ public class IssueController {
     @Autowired
     private IssueActionRepository issueActionRepository;
     @Autowired
+    private IssueParticipantRepository issueParticipantRepository;
+    @Autowired
     private ObjectMapper json;
     @Autowired
     private EmailService emailService;
     @Autowired
     private IssueService issueService;
 
-    @Value("${email.receiver}")
-    private String emailReceiver;
     @Value("${email.baseurl}")
     private String emailBaseUrl;
 
@@ -153,7 +155,7 @@ public class IssueController {
         issueActionRepository.save(action);
 
         sendEmail(String.format("Issue#%d %s", issue.getId(), issue.getTitle()), issue.getContent(),
-                currentUser.getTruename(), issue.getCreated(), issue.getId());
+                currentUser, issue.getCreated(), issue.getId());
 
         return "redirect:/issue/view/" + issue.getId();
     }
@@ -206,7 +208,7 @@ public class IssueController {
                 needBuild = true;
 
                 sendEmail(String.format("Re: Issue#%d %s", issue.getId(), issue.getTitle()), issueReplyForm.getContent(),
-                        currentUser.getTruename(), action.getCreated(), action.getIssueId());
+                        currentUser, action.getCreated(), action.getIssueId());
             }
 
             if (issueReplyForm.getStatus()) {
@@ -292,10 +294,21 @@ public class IssueController {
 
         String issueMd = renderMarkdown(issue.getContent());
 
+        List<Long> participants = new ArrayList<Long>();
+        for (IssueParticipant participant : issueParticipantRepository.findByIssueIdOrderByCreatedAsc(issue.getId())) {
+            participants.add(participant.getUserId());
+            userIds.add(participant.getUserId());
+        }
+
         List<IssueAction> actions = new ArrayList<IssueAction>();
         Map<Long, JSONObject> details = new HashMap<Long, JSONObject>();
         Map<Long, String> actionMds = new HashMap<Long, String>();
         for (IssueAction action : issueActionRepository.findByIssueIdOrderByCreatedAsc(issue.getId())) {
+
+            if (action.getAction() == IssueAction.ACTION_OPEN) {
+                continue;
+            }
+
             actions.add(action);
 
             JSONObject detail;
@@ -318,6 +331,7 @@ public class IssueController {
         }
 
         model.addAttribute("issue", issue);
+        model.addAttribute("participants", participants);
         model.addAttribute("actions", actions);
         model.addAttribute("details", details);
         model.addAttribute("users", users);
@@ -326,19 +340,37 @@ public class IssueController {
         model.addAttribute("actionMds", actionMds);
     }
 
-    private void sendEmail(String subject, String content, String truename, Date created, Long issueId) {
+    public List<EmailReceiver> assembleEmailReceivers(List<User> users) {
+        List<EmailReceiver> receivers = new ArrayList<EmailReceiver>();
+        for (User user : users) {
+            EmailReceiver receiver = new EmailReceiver();
+            receiver.setEmail(user.getEmail());
+            receiver.setName(user.getTruename());
+            receivers.add(receiver);
+        }
+        return receivers;
+    }
+
+    private void sendEmail(String subject, String content, User currentUser, Date created, Long issueId) {
+
+        ParticipantInfo par = issueService.processParticipants(content, issueId, currentUser.getId());
+        if (par.getTo().isEmpty()) {
+            logger.info("No email sent for subject: " + subject);
+            return;
+        }
 
         content = renderMarkdown(content);
 
         String signature = String.format("<p style=\"color: gray; margin-top: 30px;\">--<br>%s %s <a href=\"%s/issue/view/%d\">查看详情</a></p>",
-                truename, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(created),
+                currentUser.getId(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(created),
                 emailBaseUrl, issueId);
 
         Email email = new Email();
         email.setSubject(subject);
         email.setHtml(content + signature);
-        email.setSender(truename);
-        email.setReceivers(Arrays.asList(emailReceiver));
+        email.setSender(currentUser.getTruename());
+        email.setTo(assembleEmailReceivers(par.getTo()));
+        email.setCc(assembleEmailReceivers(par.getCc()));
         emailService.sendAsync(email);
     }
 
@@ -350,6 +382,15 @@ public class IssueController {
             html = "<pre>" + input + "</pre>";
         }
         return sanitizer.sanitize(html);
+    }
+
+    @ModelAttribute("truenames")
+    public List<String> getTruenames() {
+        List<String> truenames = new ArrayList<String>();
+        for (User user : userRepository.findAll()) {
+            truenames.add(user.getTruename());
+        }
+        return truenames;
     }
 
     @ModelAttribute("navbar")

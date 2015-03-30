@@ -64,3 +64,15 @@
   display: inline-block;
   border-radius: 3px;
 }
+
+.participant-list {
+  padding: 0;
+  margin: 5px;
+  list-style-type: none;
+}
+
+.participant-list li {
+  padding: 0;
+  margin: 5px;
+  float: left;
+}

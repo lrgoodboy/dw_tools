@@ -35,3 +35,12 @@ CREATE TABLE `issue_action` (
   PRIMARY KEY (`id`),
   KEY `issue_created` (`issue_id`, `created`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ CREATE TABLE `issue_participant` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `issue_id` bigint(20) NOT NULL,
+  `user_id` bigint(20) NOT NULL,
+  `created` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `issue_id` (`issue_id`,`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8

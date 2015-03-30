@@ -5,6 +5,7 @@
 <head>
 <title>Edit Issue</title>
 <link th:href="@{/css/issue/edit.css}" rel="stylesheet" />
+<link th:href="@{/css/jquery.atwho.min.css}" rel="stylesheet" />
 </head>
 <body>
 <div layout:fragment="content">
@@ -50,11 +51,14 @@
 </div>
 
 <th:block layout:fragment="scripts">
+<script type="text/javascript" th:src="@{/js/jquery.caret.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/jquery.atwho.min.js}"></script>
 <script type="text/javascript" th:src="@{/js/issue/edit.js}"></script>
 <script type="text/javascript" th:src="@{/js/issue/upload.js}"></script>
 <script type="text/javascript" th:inline="javascript">
 new IssueEdit({
-    contextPath: [[${#httpServletRequest.contextPath}]]
+    contextPath: [[${#httpServletRequest.contextPath}]],
+    atData: [[${truenames}]]
 });
 new IssueUpload();
 </script>
