@@ -362,7 +362,7 @@ public class IssueController {
         content = renderMarkdown(content);
 
         String signature = String.format("<p style=\"color: gray; margin-top: 30px;\">--<br>%s %s <a href=\"%s/issue/view/%d\">查看详情</a></p>",
-                currentUser.getId(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(created),
+                currentUser.getTruename(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(created),
                 emailBaseUrl, issueId);
 
         Email email = new Email();
