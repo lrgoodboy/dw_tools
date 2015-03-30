@@ -384,6 +384,15 @@ public class IssueController {
         return sanitizer.sanitize(html);
     }
 
+    @ModelAttribute("truenames")
+    public List<String> getTruenames() {
+        List<String> truenames = new ArrayList<String>();
+        for (User user : userRepository.findAll()) {
+            truenames.add(user.getTruename());
+        }
+        return truenames;
+    }
+
     @ModelAttribute("navbar")
     public String getNavBar() {
         return "issue";

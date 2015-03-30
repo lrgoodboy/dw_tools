@@ -1,6 +1,7 @@
 var IssueView = function(opts) {
     var self = this;
     self.contextPath = opts.contextPath;
+    self.opts = opts;
     $(function() {
         self.initView();
         self.initReply();
@@ -45,6 +46,12 @@ IssueView.prototype = {
                 $('#tabPreview').html(result);
             });
         });
+
+        $('[name="content"]').atwho({
+            at: '@',
+            data: self.opts.atData
+        });
+
     },
 
     _theEnd: undefined
